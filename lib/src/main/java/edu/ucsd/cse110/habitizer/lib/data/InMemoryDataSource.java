@@ -14,11 +14,10 @@ public class InMemoryDataSource {
     private final Map<Integer, Subject<Task>> taskSubjects = new HashMap<>();
     private final Subject<List<Task>> allTasksSubject = new Subject<>();
 
-    private final Map<Integer, Task> routine = new HashMap<>();
-    private final Map<Integer, Subject<Task>> routineSubjects = new HashMap<>();
-    private final Subject<List<Task>> allRoutinesSubject = new Subject<>();
+    private final Map<Integer, Routine> routines = new HashMap<>();
+    private final Map<Integer, Subject<Routine>> routineSubjects = new HashMap<>();
+    private final Subject<List<Routine>> allRoutinesSubject = new Subject<>();
 
-    private final Map<Integer, Task> routineList = new HashMap<>();
     private final Subject<RoutineList> routineListSubject = new Subject<>();
 
 
@@ -48,15 +47,42 @@ public class InMemoryDataSource {
         return allTasksSubject;
     }
 
-    public void putTask(Task flashcard) {
-        tasks.put(flashcard.id(), flashcard);
-        if (taskSubjects.containsKey(flashcard.id())) {
-            taskSubjects.get(flashcard.id()).setValue(flashcard);
+    public void putTask(Task task) {
+        tasks.put(task.id(), task);
+        if (taskSubjects.containsKey(task.id())) {
+            taskSubjects.get(task.id()).setValue(task);
         }
         allTasksSubject.setValue(getTasks());
     }
 
-    public void putRoutine(Routine routine) {};
+    public List<Routine> getRoutines() {
+        return List.copyOf(routines.values());
+    }
+
+    public Routine getRoutine(int id) {
+        return routines.get(id);
+    }
+
+    public Subject<Routine> getRoutineSubject(int id) {
+        if (!routineSubjects.containsKey(id)) {
+            var subject = new Subject<Routine>();
+            subject.setValue(getRoutine(id));
+            routineSubjects.put(id, subject);
+        }
+        return routineSubjects.get(id);
+    }
+
+    public Subject<List<Routine>> getAllRoutinesSubject() {
+        return allRoutinesSubject;
+    }
+
+    public void putRoutine(Routine routine) {
+        routines.put(routine.id(), routine);
+        if (routineSubjects.containsKey(routine.id())) {
+            routineSubjects.get(routine.id()).setValue(routine);
+        }
+        allRoutinesSubject.setValue(getRoutines());
+    }
 
     public void putRoutineList(RoutineList routineList) {
         routineListSubject.setValue(routineList);
