@@ -20,7 +20,7 @@ public class Routine {
         return this.tasks;
     }
 
-    public String name() {
+    public String getName() {
         return this.name;
     }
 }
