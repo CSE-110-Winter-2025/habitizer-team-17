@@ -37,4 +37,19 @@ public class RoutineTest {
     public void getTaskList() {
         assertEquals(tasks, expectedRoutine.getTasks());
     }
+
+    @Test
+    public void nullNameTest() {
+        assertThrows(IllegalArgumentException.class, () -> new Routine(tasks,null, 2));
+    }
+
+    @Test
+    public void emptyNameTest() {
+        assertThrows(IllegalArgumentException.class, () -> new Routine(tasks,"", 2));
+    }
+
+    @Test
+    public void nullTasksTest() {
+        assertThrows(IllegalArgumentException.class, () -> new Routine(null,"test", 2));
+    }
 }

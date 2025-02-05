@@ -28,6 +28,16 @@ public class TaskTest {
         Integer expected = 1;
         assertEquals(expected, TASK_A.id());
     }
+
+    @Test
+    public void nullNameTest() {
+        assertThrows(IllegalArgumentException.class, () -> new Task(null, 2));
+    }
+
+    @Test
+    public void emptyNameTest() {
+        assertThrows(IllegalArgumentException.class, () -> new Task("", 2));
+    }
 }
 
 /*

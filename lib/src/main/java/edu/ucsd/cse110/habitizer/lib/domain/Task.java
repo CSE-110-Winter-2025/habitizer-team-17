@@ -11,8 +11,11 @@ public class Task {
     // some sort of time field, not ready for this yet
     // ... more fields to come
     public Task(String name, Integer id) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Task Name must not be null or empty");
+        if (name == null ) {
+            throw new IllegalArgumentException("Task Name must not be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Task Name must not be empty");
         }
         this.name = name;
         this.id = id;

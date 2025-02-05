@@ -10,8 +10,15 @@ public class Routine {
     private final Integer id;
 
     public Routine(List<Task> tasks, String name, Integer id) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Routine Name must not be null or empty");
+        if (tasks == null) {
+            throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
+                    "are present");
+        }
+        if (name == null ) {
+            throw new IllegalArgumentException("Routine Name must not be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Routine Name must not be empty");
         }
         this.name = name;
         this.tasks = tasks;
