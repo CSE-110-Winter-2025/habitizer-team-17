@@ -7,7 +7,27 @@ import org.junit.Test;
 
 public class TaskTest {
 
-    Task TASK
+    Task TASK_A = new Task("A", 1);
+
+    @Test
+    public void getNameTest()  {
+        var expected = "A";
+        assertEquals(expected, TASK_A.getName());
+    }
+
+    @Test
+    public void setNameTest() {
+        var expected = "B";
+        TASK_A.setName("B");
+        assertEquals(expected, TASK_A.getName());
+        TASK_A.setName("A");
+    }
+
+    @Test
+    public void getIdTest()  {
+        Integer expected = 1;
+        assertEquals(expected, TASK_A.id());
+    }
 }
 
 /*

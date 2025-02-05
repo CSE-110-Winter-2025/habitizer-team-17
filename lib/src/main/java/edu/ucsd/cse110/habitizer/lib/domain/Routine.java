@@ -10,6 +10,9 @@ public class Routine {
     private final Integer id;
 
     public Routine(List<Task> tasks, String name, Integer id) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Routine Name must not be null or empty");
+        }
         this.name = name;
         this.tasks = tasks;
         this.id = id;
