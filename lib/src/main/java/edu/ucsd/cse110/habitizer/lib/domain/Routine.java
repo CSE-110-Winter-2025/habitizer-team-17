@@ -2,6 +2,7 @@ package edu.ucsd.cse110.habitizer.lib.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Routine {
     private List<Task> tasks;
@@ -23,5 +24,18 @@ public class Routine {
 
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Routine routine = (Routine) o;
+        return Objects.equals(tasks, routine.tasks) && Objects.equals(name, routine.name) && Objects.equals(id, routine.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tasks, name, id);
     }
 }
