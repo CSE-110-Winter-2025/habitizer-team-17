@@ -4,9 +4,11 @@ import java.util.ArrayList;
 
 public class Routine {
     private ArrayList<Task> tasks;
+    private String name;
     private final Integer id;
 
-    public Routine(ArrayList<Task> tasks, Integer id) {
+    public Routine(ArrayList<Task> tasks, String name, Integer id) {
+        this.name = name;
         this.tasks = tasks;
         this.id = id;
     }
@@ -16,5 +18,9 @@ public class Routine {
     }
     public ArrayList<Task> getTasks() {
         return this.tasks;
+    }
+
+    public String name() {
+        return this.name;
     }
 }
