@@ -97,7 +97,7 @@ public class InMemoryDataSource {
             new Task("Dinner Prep", 5),
             new Task("Pack Bag", 6)
     );
-//    public final static Routine DEFAULT_ROUTINE = new Routine(DEFAULT_TASKS, "routine_1", 0);
+    public final static Routine DEFAULT_ROUTINE = new Routine(DEFAULT_TASKS, "Morning Routine", 0);
 //
 //    public final static RoutineList DEFAULT_ROUTINE_LIST = new RoutineList(List.of(DEFAULT_ROUTINE));
 

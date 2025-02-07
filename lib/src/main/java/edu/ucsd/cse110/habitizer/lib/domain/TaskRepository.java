@@ -9,7 +9,6 @@ public class TaskRepository {
     private final InMemoryDataSource dataSource;
 
     public TaskRepository(InMemoryDataSource dataSource) {
-
         this.dataSource = dataSource;
     }
 

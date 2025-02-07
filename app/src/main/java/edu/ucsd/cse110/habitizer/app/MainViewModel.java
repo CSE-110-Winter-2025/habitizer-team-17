@@ -21,23 +21,26 @@ public class MainViewModel extends ViewModel {
 
     // UI state
     private final Subject<List<Integer>> taskOrdering;
+    private final Subject<List<Task>> orderedTasks;
 
     public static final ViewModelInitializer<MainViewModel> initializer =
-        new ViewModelInitializer<>(
-                MainViewModel.class,
-                creationExtras -> {
-                    var app = (HabitizerApplication) creationExtras.get(APPLICATION_KEY);
-                    assert app != null;
-                    return new MainViewModel((app.getTaskRepository()));
-                }
-        );
+            new ViewModelInitializer<>(
+                    MainViewModel.class,
+                    creationExtras -> {
+                        var app = (HabitizerApplication) creationExtras.get(APPLICATION_KEY);
+                        assert app != null;
+                        return new MainViewModel((app.getTaskRepository()));
+                    }
+            );
 
     public MainViewModel(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
 
         // Create the observable objects
         this.taskOrdering = new Subject<>();
+        this.orderedTasks = new Subject<>();
 
+        // Initialize ordering when tasks are loaded
         taskRepository.findAll().observe(tasks -> {
             if (tasks == null) return;
 
@@ -47,5 +50,22 @@ public class MainViewModel extends ViewModel {
             }
             taskOrdering.setValue(ordering);
         });
+
+        // Update ordered tasks when the ordering changes
+        taskOrdering.observe(ordering -> {
+            if (ordering == null) return;
+
+            var tasks = new ArrayList<Task>();
+            for (var id : ordering) {
+                var task = taskRepository.find(id).getValue();
+                if (task == null) return;
+                tasks.add(task);
+            }
+            this.orderedTasks.setValue(tasks);
+        });
+    }
+
+    public Subject<List<Task>> getOrderedTasks() {
+        return orderedTasks;
     }
 }
