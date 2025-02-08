@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(project(":lib"))
+    implementation(libs.firebase.perf)
 
     testImplementation(libs.junit4)
 
