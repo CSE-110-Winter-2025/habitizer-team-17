@@ -12,9 +12,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class TaskListFragment extends Fragment {
     private MainViewModel activityModel;
@@ -47,7 +49,11 @@ public class TaskListFragment extends Fragment {
         activityModel.getOrderedTasks().observe(tasks -> {
             if (tasks == null) return;
             adapter.clear();
-            adapter.addAll(new ArrayList<>(tasks));
+            ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
+            Stream<Task> filteredIdList = taskAdapterList.stream().filter(
+                    o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
+            );
+            adapter.addAll(filteredIdList.toList());
             adapter.notifyDataSetChanged();
         });
     }
@@ -56,6 +62,20 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
+        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getIsShowingMorning().getValue() ? "Morning Routine" : "Evening Routine"));
+        view.nextButton.setOnClickListener(v -> {
+                    activityModel.nextRoutine();
+                    List<Task> tasks = activityModel.getOrderedTasks().getValue();
+                    if (tasks == null) return;
+                    adapter.clear();
+                    ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
+                    Stream<Task> filteredIdList = taskAdapterList.stream().filter(
+                            o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
+                    );
+                    adapter.addAll(filteredIdList.toList());
+                    adapter.notifyDataSetChanged();
+                }
+        );
 
         return view.getRoot();
     }

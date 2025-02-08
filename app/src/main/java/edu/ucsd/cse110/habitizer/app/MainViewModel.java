@@ -22,6 +22,8 @@ public class MainViewModel extends ViewModel {
     // UI state
     private final Subject<List<Integer>> taskOrdering;
     private final Subject<List<Task>> orderedTasks;
+    private final Subject<Boolean> isShowingMorning;
+    private final Subject<String> title;
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -39,6 +41,8 @@ public class MainViewModel extends ViewModel {
         // Create the observable objects
         this.taskOrdering = new Subject<>();
         this.orderedTasks = new Subject<>();
+        this.isShowingMorning = new Subject<>();
+        this.title = new Subject<>();
 
         // Initialize ordering when tasks are loaded
         taskRepository.findAll().observe(tasks -> {
@@ -50,6 +54,8 @@ public class MainViewModel extends ViewModel {
             }
             taskOrdering.setValue(ordering);
         });
+
+        isShowingMorning.setValue(true);
 
         // Update ordered tasks when the ordering changes
         taskOrdering.observe(ordering -> {
@@ -63,9 +69,29 @@ public class MainViewModel extends ViewModel {
             }
             this.orderedTasks.setValue(tasks);
         });
+
+        // When the top routine changes, update the routineId
+        isShowingMorning.observe(isShowingMorning -> {
+            if (isShowingMorning == null) return;
+            title.setValue(isShowingMorning ? "Morning Routine" : "Evening Routine");
+        });
     }
 
     public Subject<List<Task>> getOrderedTasks() {
         return orderedTasks;
+    }
+
+    public void nextRoutine() {
+        var isShowingMorning = this.isShowingMorning.getValue();
+        if (isShowingMorning == null) return;
+        this.isShowingMorning.setValue(!isShowingMorning);
+    }
+
+    public Subject<Boolean> getIsShowingMorning() {
+        return this.isShowingMorning;
+    }
+
+    public Subject<String> getTitle() {
+        return this.title;
     }
 }
