@@ -24,6 +24,8 @@ public class MainViewModel extends ViewModel {
     private final Subject<List<Task>> orderedTasks;
     private final Subject<Boolean> isShowingMorning;
     private final Subject<String> title;
+    private final Subject<String> completedTime;
+    private final Subject<Boolean> isTimerRunning;
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -76,6 +78,45 @@ public class MainViewModel extends ViewModel {
             title.setValue(isShowingMorning ? "Morning Routine" : "Evening Routine");
         });
     }
+    private void updateTitle(boolean isShowingMorning) {
+        String routineTitle = isShowingMorning ? "Morning Routine" : "Evening Routine";
+        String timeDisplay = completedTime.getValue();
+
+        if (timeDisplay != null && !timeDisplay.isEmpty()) {
+            routineTitle += " - " + timeDisplay;
+        }
+
+        title.setValue(routineTitle);
+    }
+
+    // Timer control methods
+    public void startTimer() {
+        completedTime.setValue("");
+        updateTitle(isShowingMorning.getValue());
+        timer.start();
+        isTimerRunning.setValue(true);
+    }
+    public void stopTimer() {
+        if (isTimerRunning.getValue()) {
+            timer.stop();
+            isTimerRunning.setValue(false);
+            // Update completed time when stopping
+            String finalTime = timer.getFormattedTime();
+            completedTime.setValue(finalTime);
+            updateTitle(isShowingMorning.getValue());
+        }
+    }
+
+    public void forwardTimer() {
+        if (!timer.isRunning()) {
+            timer.setMockMode(true);
+            timer.forward();
+            String currentTime = timer.getFormattedTime();
+            completedTime.setValue(currentTime);
+            updateTitle(isShowingMorning.getValue());
+        }
+    }
+
 
     public Subject<List<Task>> getOrderedTasks() {
         return orderedTasks;
@@ -93,5 +134,13 @@ public class MainViewModel extends ViewModel {
 
     public Subject<String> getTitle() {
         return this.title;
+    }
+
+    public Subject<Boolean> getIsTimerRunning() {
+        return isTimerRunning;
+    }
+
+    public Subject<String> getCompletedTime() {
+        return completedTime;
     }
 }
