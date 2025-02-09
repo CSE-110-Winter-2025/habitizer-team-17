@@ -50,10 +50,7 @@ public class TaskListFragment extends Fragment {
             if (tasks == null) return;
             adapter.clear();
             ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
-            Stream<Task> filteredIdList = taskAdapterList.stream().filter(
-                    o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
-            );
-            adapter.addAll(filteredIdList.toList());
+            adapter.addAll(taskAdapterList);
             adapter.notifyDataSetChanged();
         });
     }
@@ -62,17 +59,12 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
-        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getIsShowingMorning().getValue() ? "Morning Routine" : "Evening Routine"));
+        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
         view.nextButton.setOnClickListener(v -> {
                     activityModel.nextRoutine();
-                    List<Task> tasks = activityModel.getOrderedTasks().getValue();
-                    if (tasks == null) return;
                     adapter.clear();
-                    ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
-                    Stream<Task> filteredIdList = taskAdapterList.stream().filter(
-                            o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
-                    );
-                    adapter.addAll(filteredIdList.toList());
+                    ArrayList<Task> taskAdapterList = new ArrayList<>(activityModel.getOrderedTasks().getValue());
+                    adapter.addAll(taskAdapterList);
                     adapter.notifyDataSetChanged();
                 }
         );

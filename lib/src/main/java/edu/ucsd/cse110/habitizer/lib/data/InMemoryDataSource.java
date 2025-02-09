@@ -88,6 +88,12 @@ public class InMemoryDataSource {
         routineListSubject.setValue(routineList);
     };
 
+    public void putTaskList(List<Task> tasks){
+        for(var task: tasks){
+            this.putTask(task);
+        }
+    }
+
     public final static List<Task> MORNING_TASKS = List.of(
             new Task(0,"Shower"),
             new Task(1, "Brush Teeth"),
@@ -103,7 +109,7 @@ public class InMemoryDataSource {
     );
     public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS);
 
-    public final static Routine EVENING_ROUTINE = new Routine(0, "Evening Routine",  EVENING_TASKS);
+    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS);
 
 //
 //    public final static RoutineList DEFAULT_ROUTINE_LIST = new RoutineList(List.of(DEFAULT_ROUTINE));
@@ -112,6 +118,9 @@ public class InMemoryDataSource {
         var data = new InMemoryDataSource();
         data.putRoutine(MORNING_ROUTINE);
         data.putRoutine(EVENING_ROUTINE);
+        data.putTaskList(MORNING_TASKS);
+        data.putTaskList(EVENING_TASKS);
+
         return data;
     }
 }
