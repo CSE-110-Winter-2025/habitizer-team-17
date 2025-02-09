@@ -2,9 +2,9 @@ package edu.ucsd.cse110.habitizer.lib.domain;
 
 import java.util.List;
 
-import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
-import edu.ucsd.cse110.habitizer.lib.util.Subject;
 
+import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
+import edu.ucsd.cse110.observables.MutableSubject;
 public class TaskRepository {
     private final InMemoryDataSource dataSource;
 
@@ -16,12 +16,12 @@ public class TaskRepository {
         return dataSource.getTasks().size();
     }
 
-    public Subject<Task> find (int id) {
+    public MutableSubject<Task> find (int id) {
 
         return dataSource.getTaskSubject(id);
     }
 
-    public Subject<List<Task>> findAll() {
+    public MutableSubject<List<Task>> findAll() {
 
         return dataSource.getAllTasksSubject();
     }
