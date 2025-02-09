@@ -11,7 +11,8 @@ import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.TaskRepository;
-import edu.ucsd.cse110.habitizer.lib.util.Subject;
+import edu.ucsd.cse110.observables.MutableSubject;
+import edu.ucsd.cse110.observables.PlainMutableSubject;
 
 public class MainViewModel extends ViewModel {
     private static final String LOG_TAG = "MainViewModel";
@@ -20,10 +21,10 @@ public class MainViewModel extends ViewModel {
     private final TaskRepository taskRepository;
 
     // UI state
-    private final Subject<List<Integer>> taskOrdering;
-    private final Subject<List<Task>> orderedTasks;
-    private final Subject<Boolean> isShowingMorning;
-    private final Subject<String> title;
+    private final MutableSubject<List<Integer>> taskOrdering;
+    private final MutableSubject<List<Task>> orderedTasks;
+    private final MutableSubject<Boolean> isShowingMorning;
+    private final MutableSubject<String> title;
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -39,10 +40,10 @@ public class MainViewModel extends ViewModel {
         this.taskRepository = taskRepository;
 
         // Create the observable objects
-        this.taskOrdering = new Subject<>();
-        this.orderedTasks = new Subject<>();
-        this.isShowingMorning = new Subject<>();
-        this.title = new Subject<>();
+        this.taskOrdering = new PlainMutableSubject<>();
+        this.orderedTasks = new PlainMutableSubject<>();
+        this.isShowingMorning = new PlainMutableSubject<>();
+        this.title = new PlainMutableSubject<>();
 
         // Initialize ordering when tasks are loaded
         taskRepository.findAll().observe(tasks -> {
@@ -77,7 +78,7 @@ public class MainViewModel extends ViewModel {
         });
     }
 
-    public Subject<List<Task>> getOrderedTasks() {
+    public MutableSubject<List<Task>> getOrderedTasks() {
         return orderedTasks;
     }
 
@@ -87,11 +88,11 @@ public class MainViewModel extends ViewModel {
         this.isShowingMorning.setValue(!isShowingMorning);
     }
 
-    public Subject<Boolean> getIsShowingMorning() {
+    public MutableSubject<Boolean> getIsShowingMorning() {
         return this.isShowingMorning;
     }
 
-    public Subject<String> getTitle() {
+    public MutableSubject<String> getTitle() {
         return this.title;
     }
 }
