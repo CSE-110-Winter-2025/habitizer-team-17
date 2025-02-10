@@ -62,21 +62,42 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
-        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getIsShowingMorning().getValue() ? "Morning Routine" : "Evening Routine"));
+
+        // Update title and timer display
+        activityModel.getTitle().observe(o -> view.displayedTitle.setText(o));
+        activityModel.getCompletedTime().observe(o -> {
+            if (view.timerDisplay != null) {
+                view.timerDisplay.setText(o != null ? o : "00:00");
+            }
+        });
+
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            if (view.startButton != null && view.stopButton != null) {
+                view.startButton.setEnabled(!isRunning);
+                view.stopButton.setEnabled(isRunning);
+            }
+        });
+
+        // Button click listeners
+        view.startButton.setOnClickListener(v -> activityModel.startTimer());
+        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+
+        // Next Routine Button
         view.nextButton.setOnClickListener(v -> {
-                    activityModel.nextRoutine();
-                    List<Task> tasks = activityModel.getOrderedTasks().getValue();
-                    if (tasks == null) return;
-                    adapter.clear();
-                    ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
-                    Stream<Task> filteredIdList = taskAdapterList.stream().filter(
-                            o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
-                    );
-                    adapter.addAll(filteredIdList.toList());
-                    adapter.notifyDataSetChanged();
-                }
-        );
+            activityModel.nextRoutine();
+            List<Task> tasks = activityModel.getOrderedTasks().getValue();
+            if (tasks == null) return;
+            adapter.clear();
+            ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
+            Stream<Task> filteredIdList = taskAdapterList.stream().filter(
+                    o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
+            );
+            adapter.addAll(filteredIdList.toList());
+            adapter.notifyDataSetChanged();
+        });
 
         return view.getRoot();
+
     }
 }

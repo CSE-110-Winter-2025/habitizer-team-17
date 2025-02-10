@@ -86,11 +86,13 @@ public class MainViewModel extends ViewModel {
     }
 
     public void startTimer() {
-        completedTime.setValue("");
-        updateTitle(isShowingMorning.getValue());
-        timer.start();
+        timer.reset(); // Reset timer to 0 before starting
+        completedTime.setValue("00:00"); // Reset display time
+        updateTitle(isShowingMorning.getValue()); // Update title
+        timer.start(); // Start timer
         isTimerRunning.setValue(true);
     }
+
 
     public void stopTimer() {
         if (isTimerRunning.getValue()) {

@@ -29,10 +29,12 @@ public class CustomTimer {
 
     public void start() {
         if (!isRunning && !isMocked) {
-            startTimer();
+            reset(); // Reset elapsed time
+            startTimer(); // Ensure a new timer is created
             isRunning = true;
         }
     }
+
 
     public void stop() {
         if (isRunning) {
@@ -73,4 +75,14 @@ public class CustomTimer {
     public boolean isRunning() {
         return isRunning;
     }
+
+    public void reset() {
+        if (timer != null) {
+            timer.cancel(); // Stop the existing timer
+            timer.purge();
+        }
+        elapsedTime = 0;
+        isRunning = false; // Ensure it's not marked as running
+    }
+
 }
