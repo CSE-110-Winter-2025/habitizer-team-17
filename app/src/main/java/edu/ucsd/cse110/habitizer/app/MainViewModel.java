@@ -32,6 +32,8 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Routine> currentRoutine;
     private final MutableSubject<String> title;
 
+    private final List<MutableSubject<Boolean>> checkedTasks;
+
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
@@ -52,6 +54,7 @@ public class MainViewModel extends ViewModel {
         this.orderedTasks = new PlainMutableSubject<>();
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
+        this.checkedTasks = new ArrayList<>();
 
         routineRepository.findAll().observe(
                 routines -> {
@@ -107,6 +110,14 @@ public class MainViewModel extends ViewModel {
             this.orderedTasks.setValue(tasks);
         });
 
+        orderedTasks.observe(tasks -> {
+            if(tasks == null) return;
+
+            checkedTasks.clear();
+            for(int i = 0; i < tasks.size(); i++){
+                checkedTasks.add(new PlainMutableSubject<Boolean>(false));
+            }
+        });
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
