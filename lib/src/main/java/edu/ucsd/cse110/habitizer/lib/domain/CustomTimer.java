@@ -9,11 +9,13 @@ public class CustomTimer {
     private boolean isMocked;
     private final int FORWARD_SECONDS = 30;
     private TimerTask timerTask;
+    private String completedTime; // Added missing completedTime field
 
     public CustomTimer() {
         this.elapsedTime = 0;
         this.isRunning = false;
         this.isMocked = false;
+        this.completedTime = "00:00"; // Initialize completedTime
     }
 
     private void startTimer() {
@@ -28,19 +30,29 @@ public class CustomTimer {
     }
 
     public void start() {
-        if (!isRunning && !isMocked) {
-            reset(); // Reset elapsed time
-            startTimer(); // Ensure a new timer is created
+        if (!isRunning) {
+            reset(); // Ensure timer is reset before starting
+            startTimer();
             isRunning = true;
+        } else {
         }
     }
 
 
+
     public void stop() {
         if (isRunning) {
-            timer.cancel();
-            timer.purge();
+            System.out.println("🛑 Stopping Timer...");
+            if (timer != null) {
+                timer.cancel();
+                timer.purge();
+                timer = null;
+            }
             isRunning = false;
+
+            // Capture final time including fast-forward
+            completedTime = getFormattedTime();
+        } else {
         }
     }
 
@@ -48,9 +60,19 @@ public class CustomTimer {
         if (!isMocked) {
             return false;
         }
-        elapsedTime += (FORWARD_SECONDS * 1000);
+
+
+        elapsedTime += (FORWARD_SECONDS * 1000); // ✅ Add 30 seconds
+
+
+        // ✅ Ensure completedTime updates even if the timer is stopped
+        completedTime = getFormattedTime();
+
         return true;
     }
+
+
+
 
     public void setMockMode(boolean mock) {
         if (mock != isMocked) {
@@ -65,11 +87,11 @@ public class CustomTimer {
         long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
 
-        if (hours > 0) {
-            return String.format("%d:%02d", hours, minutes);
-        } else {
-            return String.format("%d:%02d", minutes, seconds);
-        }
+        completedTime = (hours > 0)
+                ? String.format("%d:%02d", hours, minutes)
+                : String.format("%02d:%02d", minutes, seconds);
+
+        return completedTime;
     }
 
     public boolean isRunning() {
@@ -78,11 +100,12 @@ public class CustomTimer {
 
     public void reset() {
         if (timer != null) {
-            timer.cancel(); // Stop the existing timer
+            timer.cancel();
             timer.purge();
+            timer = null; // ✅ Ensure timer is reset
         }
         elapsedTime = 0;
-        isRunning = false; // Ensure it's not marked as running
+        isRunning = false;
+        completedTime = "00:00"; // ✅ Reset completedTime
     }
-
 }

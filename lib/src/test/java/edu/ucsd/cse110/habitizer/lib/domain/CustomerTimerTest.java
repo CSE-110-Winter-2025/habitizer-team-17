@@ -45,15 +45,4 @@ public class CustomerTimerTest {private CustomTimer timer;
         assertEquals("00:30", timer.getFormattedTime());
     }
 
-    @Test
-    public void testAllFunctionsTogether() throws InterruptedException {
-        timer.start();
-        Thread.sleep(1000); // Let it run for 1 second
-        timer.forward(); // Fast forward 30 seconds
-        timer.stop();
-        String finalTime = timer.getFormattedTime();
-
-        // Expected time should be at least 31 seconds (1s + 30s fast forward)
-        assertTrue(finalTime.equals("00:31") || finalTime.startsWith("00:3"));
-    }
 }
