@@ -16,12 +16,14 @@ import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
-    private FragmentTaskListBinding view;
-    private TaskListAdapter adapter;
+    private RoutineScreenBinding view;
+    private RoutineTaskAdapter adapter;
 
     public RoutineTaskFragment() {
         // Required empty constructor
@@ -45,11 +47,14 @@ public class RoutineTaskFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
-        this.adapter = new TaskListAdapter(requireContext(), List.of());
-        activityModel.getOrderedTasks().observe(tasks -> {
-            if (tasks == null) return;
+        this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
+            activityModel.checkTask(id);
+
+        });
+        activityModel.getActiveRoutine().observe(routine -> {
+            if (routine == null) return;
             adapter.clear();
-            ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
+            ArrayList<ActiveTask> taskAdapterList = new ArrayList<>(routine.activeTasks());
             adapter.addAll(taskAdapterList);
             adapter.notifyDataSetChanged();
         });
@@ -57,17 +62,9 @@ public class RoutineTaskFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = FragmentTaskListBinding.inflate(inflater, container, false);
-        view.taskList.setAdapter(adapter);
-        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
-        view.nextButton.setOnClickListener(v -> {
-                    activityModel.nextRoutine();
-                    adapter.clear();
-                    ArrayList<Task> taskAdapterList = new ArrayList<>(activityModel.getOrderedTasks().getValue());
-                    adapter.addAll(taskAdapterList);
-                    adapter.notifyDataSetChanged();
-                }
-        );
+        view = RoutineScreenBinding.inflate(inflater, container, false);
+        view.activeList.setAdapter(adapter);
+        activityModel.getTitle().observe(o -> view.routineTitle.setText(activityModel.getTitle().getValue()));
 
         return view.getRoot();
     }

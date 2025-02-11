@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTaskRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineList;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
@@ -24,6 +27,8 @@ public class MainViewModel extends ViewModel {
     private final RoutineRepository routineRepository;
 
     private final TaskRepository taskRepository;
+
+    private final ActiveTaskRepository activeTaskRepository;
     // UI state
     private final MutableSubject<List<Integer>> routineOrdering;
     private final MutableSubject<List<Routine>> orderedRoutines;
@@ -32,7 +37,8 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Routine> currentRoutine;
     private final MutableSubject<String> title;
 
-    private final List<MutableSubject<Boolean>> checkedTasks;
+    private final MutableSubject<ActiveRoutine> activeRoutine;
+
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -40,13 +46,14 @@ public class MainViewModel extends ViewModel {
                     creationExtras -> {
                         var app = (HabitizerApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
-                        return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository());
+                        return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository(), app.getActiveTaskRepository());
                     }
             );
 
-    public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository) {
+    public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository, ActiveTaskRepository activeTaskRepository) {
         this.routineRepository = routineRepository;
         this.taskRepository = taskRepository;
+        this.activeTaskRepository = activeTaskRepository;
         // Create the observable objects
         this.routineOrdering = new PlainMutableSubject<>();
         this.orderedRoutines = new PlainMutableSubject<>();
@@ -54,7 +61,7 @@ public class MainViewModel extends ViewModel {
         this.orderedTasks = new PlainMutableSubject<>();
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
-        this.checkedTasks = new ArrayList<>();
+        this.activeRoutine = new PlainMutableSubject<>();
 
         routineRepository.findAll().observe(
                 routines -> {
@@ -110,18 +117,27 @@ public class MainViewModel extends ViewModel {
             this.orderedTasks.setValue(tasks);
         });
 
-        orderedTasks.observe(tasks -> {
-            if(tasks == null) return;
 
-            checkedTasks.clear();
-            for(int i = 0; i < tasks.size(); i++){
-                checkedTasks.add(new PlainMutableSubject<Boolean>(false));
-            }
+        currentRoutine.observe(routine -> {
+            if(routine == null) return;
+            List<ActiveTask> activeTasks = new ArrayList<>();
+            for(var task: routine.getTasks()){
+                ActiveTask newActiveTask = new ActiveTask(task, false);
+                activeTasks.add(newActiveTask);
+                activeTaskRepository.save(newActiveTask);
+            };
+
+            activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
+
         });
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
         return orderedTasks;
+    }
+
+    public MutableSubject<ActiveRoutine> getActiveRoutine(){
+        return activeRoutine;
     }
 
     public void nextRoutine() {
@@ -131,6 +147,16 @@ public class MainViewModel extends ViewModel {
         var newOrdering = RoutineList.rotateRoutine(routineOrdering.getValue(), 1);
 
         routineOrdering.setValue(newOrdering);
+    }
+
+    public void checkTask(Integer id){
+        if(this.activeRoutine.getValue() == null){
+            return;
+        }
+        var task = activeTaskRepository.find(id).getValue();
+        task.setChecked(!task.isChecked());
+        activeTaskRepository.save(task);
+        activeRoutine.setValue(activeRoutine.getValue().setActiveTask(task));
     }
 
     public MutableSubject<Routine> getCurrentRoutine() {
