@@ -12,16 +12,15 @@ import java.util.Objects;
 
 public class RoutineTest {
     public final static List<Task> tasks = List.of(
-            new Task("Shower", 0, 0),
-            new Task("Brush Teeth", 1, 0),
-            new Task("Dress", 2, 0),
-            new Task("Make Coffee", 3, 0),
-            new Task("Make Lunch", 4, 0),
-            new Task("Dinner Prep", 5, 0),
-            new Task("Pack Bag", 6, 0),
-            new Task("Pack Balls", 7, 1)
+            new Task(0,"Shower"),
+            new Task(1, "Brush Teeth"),
+            new Task(2,"Dress"),
+            new Task(3,"Make Coffee"),
+            new Task(4,"Make Lunch"),
+            new Task(5,"Dinner Prep"),
+            new Task(6,"Pack Bag")
     );
-    public final static Routine expectedRoutine = new Routine(tasks, "expectedRoutine", 0);
+    public final static Routine expectedRoutine = new Routine(0, "expectedRoutine", tasks);
 
     @Test
     public void getExpectedName() {
@@ -41,16 +40,16 @@ public class RoutineTest {
 
     @Test
     public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(tasks,null, 2));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null,tasks));
     }
 
     @Test
     public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(tasks,"", 2));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"",tasks));
     }
 
     @Test
     public void nullTasksTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(null,"test", 2));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"test", null));
     }
 }

@@ -8,23 +8,39 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.ucsd.cse110.habitizer.lib.domain.Routine;
+import edu.ucsd.cse110.habitizer.lib.domain.RoutineList;
+import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.TaskRepository;
+
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer; // 🔥 Correct Import
-import edu.ucsd.cse110.habitizer.lib.util.Subject;
+
+import edu.ucsd.cse110.observables.MutableSubject;
+import edu.ucsd.cse110.observables.PlainMutableSubject;
+
 
 public class MainViewModel extends ViewModel {
     private static final String LOG_TAG = "MainViewModel";
 
     // Domain state (true "Model" state)
+
     private final TaskRepository taskRepository;
     private final CustomTimer timer;
-    private final Subject<List<Integer>> taskOrdering;
-    private final Subject<List<Task>> orderedTasks;
-    private final Subject<Boolean> isShowingMorning;
-    private final Subject<String> title;
-    private final Subject<String> completedTime;
-    private final Subject<Boolean> isTimerRunning;
+    private final MutableSubject<Boolean> isShowingMorning;
+    private final MutableSubject<String> completedTime;
+    private final MutableSubject<Boolean> isTimerRunning;
+
+    private final RoutineRepository routineRepository;
+
+    // UI state
+    private final MutableSubject<List<Integer>> routineOrdering;
+    private final MutableSubject<List<Routine>> orderedRoutines;
+    private final MutableSubject<List<Integer>> taskOrdering;
+    private final MutableSubject<List<Task>> orderedTasks;
+    private final MutableSubject<Routine> currentRoutine;
+    private final MutableSubject<String> title;
+
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -32,36 +48,82 @@ public class MainViewModel extends ViewModel {
                     creationExtras -> {
                         var app = (HabitizerApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
-                        return new MainViewModel((app.getTaskRepository()));
+                        return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository());
                     }
             );
 
-    public MainViewModel(TaskRepository taskRepository) {
+    public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository) {
+        this.routineRepository = routineRepository;
         this.taskRepository = taskRepository;
-        this.taskOrdering = new Subject<>();
-        this.orderedTasks = new Subject<>();
-        this.isShowingMorning = new Subject<>();
-        this.title = new Subject<>();
-        this.completedTime = new Subject<>();
-        this.isTimerRunning = new Subject<>();
+
+        this.taskOrdering = new PlainMutableSubject<>();
+        this.orderedTasks = new PlainMutableSubject<>();
+        this.isShowingMorning = new PlainMutableSubject<>();
+        this.title = new PlainMutableSubject<>();
+        this.completedTime = new PlainMutableSubject<>();
+        this.isTimerRunning = new PlainMutableSubject<>();
         this.timer = new CustomTimer();
 
         this.isTimerRunning.setValue(false);
         this.completedTime.setValue("");
         isShowingMorning.setValue(true);
 
-        taskRepository.findAll().observe(tasks -> {
-            if (tasks == null) return;
-            var ordering = new ArrayList<Integer>();
-            for (int i = 0; i < tasks.size(); i++) {
-                ordering.add(i);
+
+        // Create the observable objects
+        this.routineOrdering = new PlainMutableSubject<>();
+        this.orderedRoutines = new PlainMutableSubject<>();
+        this.taskOrdering = new PlainMutableSubject<>();
+        this.orderedTasks = new PlainMutableSubject<>();
+        this.currentRoutine = new PlainMutableSubject<>();
+        this.title = new PlainMutableSubject<>();
+
+        routineRepository.findAll().observe(
+                routines -> {
+                    if(routines == null) return;
+
+                    var ordering = new ArrayList<Integer>();
+                    for(int i = 0; i < routines.size(); i++){
+                        ordering.add(routines.get(i).id());
+                    }
+                    routineOrdering.setValue(ordering);
+                }
+        );
+
+        routineOrdering.observe(ordering -> {
+            if (ordering == null) return;
+
+            var routines = new ArrayList<Routine>();
+            for (var id : ordering) {
+                var routine = routineRepository.find(id).getValue();
+                if (routine == null) return;
+                routines.add(routine);
             }
+            this.orderedRoutines.setValue(routines);
+            currentRoutine.setValue(routines.get(0));
+        });
+
+
+
+        // Initialize ordering when tasks are loaded
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
+            var ordering = new ArrayList<Integer>();
+            for (int i = 0; i < routine.getTasks().size(); i++) {
+                ordering.add(routine.getTasks().get(i).id());
+            }
+            title.setValue(routine.getName());
             taskOrdering.setValue(ordering);
         });
+
+
+
+
+        // Update ordered tasks when the ordering changes
 
         taskOrdering.observe(ordering -> {
             if (ordering == null) return;
             var tasks = new ArrayList<Task>();
+
             for (var id : ordering) {
                 var task = taskRepository.find(id).getValue();
                 if (task == null) return;
@@ -113,30 +175,33 @@ public class MainViewModel extends ViewModel {
             updateTitle(isShowingMorning.getValue());
         }
     }
-
-    public Subject<List<Task>> getOrderedTasks() {
+ 
+    public MutableSubject<List<Task>> getOrderedTasks() {
         return orderedTasks;
     }
 
     public void nextRoutine() {
-        var isShowingMorning = this.isShowingMorning.getValue();
-        if (isShowingMorning == null) return;
-        this.isShowingMorning.setValue(!isShowingMorning);
+        if(this.routineOrdering.getValue() == null){
+            return;
+        }
+        var newOrdering = RoutineList.rotateRoutine(routineOrdering.getValue(), 1);
+
+        routineOrdering.setValue(newOrdering);
     }
 
-    public Subject<Boolean> getIsShowingMorning() {
-        return this.isShowingMorning;
+    public MutableSubject<Routine> getCurrentRoutine() {
+        return this.getCurrentRoutine();
     }
 
-    public Subject<String> getTitle() {
+    public MutableSubject<String> getTitle() {
         return this.title;
     }
 
-    public Subject<Boolean> getIsTimerRunning() {
+    public MutableSubject<Boolean> getIsTimerRunning() {
         return isTimerRunning;
     }
 
-    public Subject<String> getCompletedTime() {
+    public MutableSubject<String> getCompletedTime() {
         return completedTime;
     }
 }

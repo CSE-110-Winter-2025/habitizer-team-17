@@ -1,15 +1,19 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Routine {
-    private List<Task> tasks;
-    private String name;
-    private final Integer id;
+    private @NonNull List<Task> tasks;
 
-    public Routine(List<Task> tasks, String name, Integer id) {
+    private @NonNull String name;
+    private final @Nullable Integer id;
+
+    public Routine(@Nullable Integer id, @NonNull String name, @NonNull List<Task> tasks) {
         if (tasks == null) {
             throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
                     "are present");
@@ -41,11 +45,11 @@ public class Routine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Routine routine = (Routine) o;
-        return Objects.equals(tasks, routine.tasks) && Objects.equals(name, routine.name) && Objects.equals(id, routine.id);
+        return Objects.equals(getTasks(), routine.getTasks()) && Objects.equals(getName(), routine.getName()) && Objects.equals(id, routine.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tasks, name, id);
+        return Objects.hash(getTasks(), getName(), id);
     }
 }

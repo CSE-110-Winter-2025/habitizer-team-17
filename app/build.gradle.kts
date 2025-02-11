@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(project(":lib"))
     implementation(libs.firebase.perf)
-
+    implementation(project(":observables"))
     testImplementation(libs.junit4)
 
     androidTestImplementation(libs.androidx.test.ext.junit)

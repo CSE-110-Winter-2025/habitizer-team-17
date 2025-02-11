@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class TaskTest {
 
-    Task TASK_A = new Task("A", 1, 0);
+    Task TASK_A = new Task(1,"A");
 
     @Test
     public void getNameTest()  {
@@ -31,12 +31,12 @@ public class TaskTest {
 
     @Test
     public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task(null, 2, 0));
+        assertThrows(IllegalArgumentException.class, () -> new Task(2,null));
     }
 
     @Test
     public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task("", 2, 0));
+        assertThrows(IllegalArgumentException.class, () -> new Task(2,""));
     }
 }
 

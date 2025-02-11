@@ -50,10 +50,7 @@ public class TaskListFragment extends Fragment {
             if (tasks == null) return;
             adapter.clear();
             ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
-            Stream<Task> filteredIdList = taskAdapterList.stream().filter(
-                    o -> o.routineId().equals(activityModel.getIsShowingMorning().getValue() ? 0 : 1)
-            );
-            adapter.addAll(filteredIdList.toList());
+            adapter.addAll(taskAdapterList);
             adapter.notifyDataSetChanged();
         });
     }
@@ -98,6 +95,5 @@ public class TaskListFragment extends Fragment {
         });
 
         return view.getRoot();
-
     }
 }
