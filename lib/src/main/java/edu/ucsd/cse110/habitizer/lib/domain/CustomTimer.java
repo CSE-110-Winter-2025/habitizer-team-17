@@ -14,7 +14,7 @@ public class CustomTimer {
     public CustomTimer() {
         this.elapsedTime = 0;
         this.isRunning = false;
-        this.isMocked = false;
+        this.isMocked = true;
         this.completedTime = "00:00";
     }
 
@@ -53,9 +53,9 @@ public class CustomTimer {
         }
     }
 
-    public boolean forward() {
+    public void forward() {
         if (!isMocked) {
-            return false;
+            return;
         }
 
 
@@ -63,8 +63,6 @@ public class CustomTimer {
 
 
         completedTime = getFormattedTime();
-
-        return true;
     }
 
 
