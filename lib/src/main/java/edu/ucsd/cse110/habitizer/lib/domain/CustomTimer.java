@@ -1,4 +1,5 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,6 +12,7 @@ public class CustomTimer {
     private final int Final_Seconds = 1000;
     private TimerTask timerTask;
     private String completedTime;
+
     public CustomTimer() {
         this.elapsedTime = 0;
         this.isRunning = false;
@@ -19,6 +21,10 @@ public class CustomTimer {
     }
 
     private void startTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
         timer = new Timer();
         timerTask = new TimerTask() {
             @Override
@@ -26,19 +32,15 @@ public class CustomTimer {
                 elapsedTime += Final_Seconds;
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 0, 1000);
+        timer.schedule(timerTask, 1000, 1000); // Schedule with a delay of 1s, then repeat every 1s
     }
 
     public void start() {
         if (!isRunning) {
-            reset();
-            startTimer();
+            startTimer(); // Start from the current elapsed time
             isRunning = true;
-        } else {
         }
     }
-
-
 
     public void stop() {
         if (isRunning) {
@@ -49,7 +51,6 @@ public class CustomTimer {
             }
             isRunning = false;
             completedTime = getFormattedTime();
-        } else {
         }
     }
 
@@ -57,16 +58,9 @@ public class CustomTimer {
         if (!isMocked) {
             return;
         }
-
-
         elapsedTime += (FORWARD_SECONDS * Final_Seconds);
-
-
         completedTime = getFormattedTime();
     }
-
-
-
 
     public void setMockMode(boolean mock) {
         if (mock != isMocked) {
@@ -81,11 +75,9 @@ public class CustomTimer {
         long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
 
-        completedTime = (hours > 0)
+        return (hours > 0)
                 ? String.format("%d:%02d", hours, minutes)
                 : String.format("%02d:%02d", minutes, seconds);
-
-        return completedTime;
     }
 
     public boolean isRunning() {

@@ -61,17 +61,15 @@ public class TaskListFragment extends Fragment {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
-        activityModel.getCompletedTime().observe(o -> {
-            if (view.timerDisplay != null) {
-                view.timerDisplay.setText(o != null ? o : "00:00");
-            }
+        // when time changes, update UI, as long as timer is started
+        activityModel.getCurrentTime().observe(o -> {
+                view.timerDisplay.setText(o);
         });
 
+        //
         activityModel.getIsTimerRunning().observe(isRunning -> {
-            if (view.startButton != null && view.stopButton != null) {
-                view.startButton.setEnabled(!isRunning);
-                view.stopButton.setEnabled(isRunning);
-            }
+            view.startButton.setEnabled(!isRunning);
+            view.stopButton.setEnabled(isRunning);
         });
 
         // Button click listeners
