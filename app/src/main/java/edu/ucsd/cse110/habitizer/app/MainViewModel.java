@@ -2,6 +2,7 @@ package edu.ucsd.cse110.habitizer.app;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
@@ -16,7 +17,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.TaskRepository;
 import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
-
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 public class MainViewModel extends ViewModel {
     private static final String LOG_TAG = "MainViewModel";
 
@@ -31,6 +32,10 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<List<Task>> orderedTasks;
     private final MutableSubject<Routine> currentRoutine;
     private final MutableSubject<String> title;
+    private final CustomTimer timer;
+    private final MutableSubject<String> completedTime;
+    private final MutableSubject<Boolean> isTimerRunning;
+
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -41,6 +46,7 @@ public class MainViewModel extends ViewModel {
                         return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository());
                     }
             );
+    private final PlainMutableSubject<Boolean> isShowingMorning;
 
     public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository) {
         this.routineRepository = routineRepository;
@@ -48,11 +54,18 @@ public class MainViewModel extends ViewModel {
         // Create the observable objects
         this.routineOrdering = new PlainMutableSubject<>();
         this.orderedRoutines = new PlainMutableSubject<>();
+        this.isShowingMorning = new PlainMutableSubject<>();
         this.taskOrdering = new PlainMutableSubject<>();
         this.orderedTasks = new PlainMutableSubject<>();
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
-
+        this.completedTime = new PlainMutableSubject<>();
+        this.isTimerRunning = new PlainMutableSubject<>();
+        this.timer = new CustomTimer();
+        isShowingMorning.setValue(true);
+        this.isTimerRunning.setValue(false);
+        this.completedTime.setValue("");
+        
         routineRepository.findAll().observe(
                 routines -> {
                     if(routines == null) return;
@@ -122,11 +135,56 @@ public class MainViewModel extends ViewModel {
         routineOrdering.setValue(newOrdering);
     }
 
-    public MutableSubject<Routine> getCurrentRoutine() {
+    private void updateTitle(boolean isShowingMorning) {
+        String routineTitle = isShowingMorning ? "Morning Routine" : "Evening Routine";
+        String timeDisplay = completedTime.getValue();
+        if (timeDisplay != null && !timeDisplay.isEmpty()) {
+            routineTitle += " - " + timeDisplay;
+        }
+        title.setValue(routineTitle);
+    }
+
+    public void startTimer() {
+        timer.reset(); // Reset timer to 0 before starting
+        completedTime.setValue("00:00"); // Reset display time
+        updateTitle(isShowingMorning.getValue()); // Update title
+        timer.start(); // Start timer
+        isTimerRunning.setValue(true);
+    }
+
+
+    public void stopTimer() {
+        if (isTimerRunning.getValue()) {
+            timer.stop();
+            isTimerRunning.setValue(false);
+            String finalTime = timer.getFormattedTime();
+            completedTime.setValue(finalTime);
+            updateTitle(isShowingMorning.getValue());
+        }
+    }
+
+    public void forwardTimer() {
+        if (!timer.isRunning()) {
+            timer.setMockMode(true);
+            timer.forward();
+            String currentTime = timer.getFormattedTime();
+            completedTime.setValue(currentTime);
+            updateTitle(isShowingMorning.getValue());
+        }
+}
+        public MutableSubject<Routine> getCurrentRoutine() {
         return this.getCurrentRoutine();
     }
 
     public MutableSubject<String> getTitle() {
         return this.title;
+    }
+
+    public MutableSubject<Boolean> getIsTimerRunning() {
+        return isTimerRunning;
+    }
+
+    public MutableSubject<String> getCompletedTime() {
+        return completedTime;
     }
 }

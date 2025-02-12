@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
 public class TaskListFragment extends Fragment {
     private MainViewModel activityModel;
@@ -60,6 +61,23 @@ public class TaskListFragment extends Fragment {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
+        activityModel.getCompletedTime().observe(o -> {
+            if (view.timerDisplay != null) {
+                view.timerDisplay.setText(o != null ? o : "00:00");
+            }
+        });
+
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            if (view.startButton != null && view.stopButton != null) {
+                view.startButton.setEnabled(!isRunning);
+                view.stopButton.setEnabled(isRunning);
+            }
+        });
+
+        // Button click listeners
+        view.startButton.setOnClickListener(v -> activityModel.startTimer());
+        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
         view.nextButton.setOnClickListener(v -> {
                     activityModel.nextRoutine();
                     adapter.clear();
