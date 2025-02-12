@@ -52,6 +52,7 @@ public class RoutineTaskFragment extends Fragment {
 
         });
         activityModel.getActiveRoutine().observe(routine -> {
+            System.out.println("is activity Model changing");
             if (routine == null) return;
             adapter.clear();
             ArrayList<ActiveTask> taskAdapterList = new ArrayList<>(routine.activeTasks());

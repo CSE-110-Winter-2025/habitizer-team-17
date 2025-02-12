@@ -50,7 +50,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         binding.checkTask.setText(task.task().getName());
         binding.checkTask.setChecked(task.isChecked());
         if(task.isChecked()){
-            binding.checkTask.setClickable(false);
+            binding.checkTask.setEnabled(false);
         }
         binding.checkTask.setOnClickListener(view->{
             var id = task.task().id();

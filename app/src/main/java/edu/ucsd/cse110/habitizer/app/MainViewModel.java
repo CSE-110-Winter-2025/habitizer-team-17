@@ -2,6 +2,8 @@ package edu.ucsd.cse110.habitizer.app;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
@@ -39,6 +41,8 @@ public class MainViewModel extends ViewModel {
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
 
+    private final MutableLiveData<Screen> screen;
+
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -62,6 +66,7 @@ public class MainViewModel extends ViewModel {
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
         this.activeRoutine = new PlainMutableSubject<>();
+        this.screen = new MutableLiveData<Screen>(Screen.PREVIEW_SCREEN);
 
         routineRepository.findAll().observe(
                 routines -> {
@@ -154,13 +159,21 @@ public class MainViewModel extends ViewModel {
             return;
         }
         var task = activeTaskRepository.find(id).getValue();
-        task.setChecked(!task.isChecked());
+        task = task.setChecked(!task.isChecked());
         activeTaskRepository.save(task);
         activeRoutine.setValue(activeRoutine.getValue().setActiveTask(task));
     }
 
     public MutableSubject<Routine> getCurrentRoutine() {
         return this.getCurrentRoutine();
+    }
+
+    public void setScreen(Screen screen){
+        this.screen.setValue(screen);
+    }
+
+    public MutableLiveData<Screen> getScreen(){
+        return this.screen;
     }
 
     public MutableSubject<String> getTitle() {

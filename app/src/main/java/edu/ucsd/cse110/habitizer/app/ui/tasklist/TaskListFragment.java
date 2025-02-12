@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
+import edu.ucsd.cse110.habitizer.app.R;
+import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
@@ -68,6 +70,13 @@ public class TaskListFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 }
         );
+
+        view.startButton.setOnClickListener(v -> {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, RoutineTaskFragment.newInstance())
+                    .commit();
+        });
 
         return view.getRoot();
     }
