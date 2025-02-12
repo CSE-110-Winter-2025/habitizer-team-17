@@ -16,7 +16,7 @@ public class CustomTimer {
     public CustomTimer() {
         this.elapsedTime = 0;
         this.isRunning = false;
-        this.isMocked = true;
+        this.isMocked = false;
         this.completedTime = "00:00";
     }
 
@@ -55,11 +55,8 @@ public class CustomTimer {
     }
 
     public void forward() {
-        if (!isMocked) {
-            return;
-        }
         elapsedTime += (FORWARD_SECONDS * Final_Seconds);
-        completedTime = getFormattedTime();
+        // completedTime = getFormattedTime();
     }
 
     public void setMockMode(boolean mock) {
@@ -77,7 +74,7 @@ public class CustomTimer {
 
         return (hours > 0)
                 ? String.format("%d:%02d", hours, minutes)
-                : String.format("%02d:%02d", minutes, seconds);
+                : String.format("%dm", minutes);
     }
 
     public boolean isRunning() {

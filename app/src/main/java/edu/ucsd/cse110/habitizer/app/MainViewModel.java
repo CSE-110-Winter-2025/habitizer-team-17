@@ -37,6 +37,7 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<String> title;
     private final CustomTimer timer;
     private final MutableSubject<String> currentTime;
+    private final MutableSubject<String> currentTimeDisplay;
     private final MutableSubject<String> completedTime;
     private final MutableSubject<Boolean> isTimerRunning;
     private final MutableSubject<Boolean> isShowingMorning;
@@ -51,7 +52,8 @@ public class MainViewModel extends ViewModel {
                 String formatted = timer.getFormattedTime();
                 Log.d("MainViewModel", "Updating currentTime: " + formatted);
                 currentTime.setValue(formatted);
-                Log.d("MainViewModel", "Updating currentTime: " + currentTime.getValue());
+                // Log.d("MainViewModel", "Updating currentTime: " + currentTime.getValue());
+                // Log.d("MainViewModel", "Display: " + currentTimeDisplay.getValue());
                 handler.postDelayed(this, 1000);
             }
         }
@@ -81,8 +83,9 @@ public class MainViewModel extends ViewModel {
         this.completedTime = new PlainMutableSubject<>();
         this.isTimerRunning = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
+        this.currentTimeDisplay = new PlainMutableSubject<>();
         this.timer = new CustomTimer();
-        this.currentTime.setValue("00:00");
+        this.currentTime.setValue("0m");
         isShowingMorning.setValue(true);
         isTimerRunning.setValue(false);
         completedTime.setValue("");
@@ -128,6 +131,11 @@ public class MainViewModel extends ViewModel {
             }
             orderedTasks.setValue(tasks);
         });
+
+        currentTime.observe(time -> {
+            if (time == null) return;
+            updateCurrentTimeDisplay(currentTime.getValue());
+        });
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
@@ -142,17 +150,16 @@ public class MainViewModel extends ViewModel {
 
     private void updateTitle(boolean isShowingMorning) {
         String routineTitle = isShowingMorning ? "Morning Routine" : "Evening Routine";
-        String timeDisplay = completedTime.getValue();
-        if (timeDisplay != null && !timeDisplay.isEmpty()) {
-            routineTitle += " - " + timeDisplay;
-        }
         title.setValue(routineTitle);
+    }
+
+    private void updateCurrentTimeDisplay(String currentTime) {
+        currentTimeDisplay.setValue(currentTime);
     }
 
     public void startTimer() {
         timer.reset();                    // Reset timer to 0 before starting
         completedTime.setValue("00:00");   // Reset display time
-        updateTitle(isShowingMorning.getValue());
         timer.start();                    // Start the timer
         isTimerRunning.setValue(true);
         // Start the periodic update of currentTime
@@ -165,24 +172,23 @@ public class MainViewModel extends ViewModel {
             isTimerRunning.setValue(false);
             // Stop the periodic updates
             handler.removeCallbacks(updateCurrentTimeRunnable);
-            String finalTime = timer.getFormattedTime();
+            String finalTime = currentTimeDisplay.getValue();
             completedTime.setValue(finalTime);
-            updateTitle(isShowingMorning.getValue());
         }
     }
 
     public void forwardTimer() {
-        if (!timer.isRunning()) {
-            timer.setMockMode(true);
-            timer.forward();
-            String currentTimeStr = timer.getFormattedTime();
-            completedTime.setValue(currentTimeStr);
-            updateTitle(isShowingMorning.getValue());
-        }
+        timer.forward();
+        // timer.forwardElapsedTime();
+        currentTimeDisplay.setValue(timer.getFormattedTime());
     }
 
     public MutableSubject<String> getTitle() {
         return title;
+    }
+
+    public MutableSubject<String> getCurrentTimeDisplay() {
+        return currentTimeDisplay;
     }
 
     public MutableSubject<Boolean> getIsTimerRunning() {

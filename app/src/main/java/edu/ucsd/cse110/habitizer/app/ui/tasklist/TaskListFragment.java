@@ -62,15 +62,17 @@ public class TaskListFragment extends Fragment {
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
         // when time changes, update UI, as long as timer is started
-        activityModel.getCurrentTime().observe(o -> {
-                view.timerDisplay.setText(o);
-        });
+//        activityModel.getCurrentTime().observe(o -> {
+//                view.timerDisplay.setText(o);
+//        });
 
         //
         activityModel.getIsTimerRunning().observe(isRunning -> {
             view.startButton.setEnabled(!isRunning);
             view.stopButton.setEnabled(isRunning);
         });
+
+        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
 
         // Button click listeners
         view.startButton.setOnClickListener(v -> activityModel.startTimer());
