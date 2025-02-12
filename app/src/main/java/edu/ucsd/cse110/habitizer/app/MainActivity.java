@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.habitizer.app.databinding.ActivityMainBinding;
@@ -19,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MainViewModel model;
 
-
+    private MutableLiveData<Screen> screen;
 
 
     @Override
@@ -41,7 +42,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void setUpObservers(){
         System.out.println("set up observers");
-        model.getScreen().observeForever(screen -> {
+        var app = (HabitizerApplication) getApplication();
+        screen = app.getScreen();
+        screen.observeForever(screen -> {
             if(screen == null) return;
             swapFragments(screen);
         });

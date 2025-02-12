@@ -2,6 +2,8 @@ package edu.ucsd.cse110.habitizer.app;
 
 import android.app.Application;
 
+import androidx.lifecycle.MutableLiveData;
+
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutineRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTaskRepository;
@@ -13,6 +15,8 @@ import edu.ucsd.cse110.habitizer.lib.domain.TaskRepository;
 public class HabitizerApplication extends Application {
     private InMemoryDataSource dataSource;
     private RoutineRepository routineRepository;
+
+    private MutableLiveData<Screen> screen;
 
     private TaskRepository taskRepository;
 
@@ -29,6 +33,8 @@ public class HabitizerApplication extends Application {
         this.taskRepository = new TaskRepository(dataSource);
         this.activeRoutineRepository = new ActiveRoutineRepository(dataSource);
         this.activeTaskRepository = new ActiveTaskRepository(dataSource);
+        this.screen = new MutableLiveData<>(Screen.PREVIEW_SCREEN);
+
     }
 
     public RoutineRepository getRoutineRepository() {
@@ -37,6 +43,10 @@ public class HabitizerApplication extends Application {
     public TaskRepository getTaskRepository(){return taskRepository; }
 
     public ActiveRoutineRepository getActiveRoutineRepository(){return activeRoutineRepository; }
+
+    public MutableLiveData<Screen> getScreen() {
+        return screen;
+    }
 
     public ActiveTaskRepository getActiveTaskRepository() {
         return activeTaskRepository;

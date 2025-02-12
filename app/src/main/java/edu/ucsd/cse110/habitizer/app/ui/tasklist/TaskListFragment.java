@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.R;
 import edu.ucsd.cse110.habitizer.app.Screen;
@@ -72,10 +73,13 @@ public class TaskListFragment extends Fragment {
         );
 
         view.startButton.setOnClickListener(v -> {
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, RoutineTaskFragment.newInstance())
-                    .commit();
+
+            var app = (HabitizerApplication) getActivity().getApplication();
+            app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+//            getActivity().getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.fragment_container, RoutineTaskFragment.newInstance())
+//                    .commit();
         });
 
         return view.getRoot();

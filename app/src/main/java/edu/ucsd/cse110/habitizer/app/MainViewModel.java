@@ -2,6 +2,8 @@ package edu.ucsd.cse110.habitizer.app;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -41,7 +43,8 @@ public class MainViewModel extends ViewModel {
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
 
-    private final MutableLiveData<Screen> screen;
+    private final MutableLiveData<Screen> screen = new MutableLiveData<>();
+
 
 
     public static final ViewModelInitializer<MainViewModel> initializer =
@@ -66,7 +69,7 @@ public class MainViewModel extends ViewModel {
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
         this.activeRoutine = new PlainMutableSubject<>();
-        this.screen = new MutableLiveData<Screen>(Screen.PREVIEW_SCREEN);
+
 
         routineRepository.findAll().observe(
                 routines -> {
