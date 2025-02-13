@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
@@ -16,8 +18,7 @@ public class RoutineRepository {
         return dataSource.getRoutines().size();
     }
 
-    public MutableSubject<Routine> find (int id) {
-
+    public MutableSubject<Routine> find(int id) {
         return dataSource.getRoutineSubject(id);
     }
 
@@ -27,8 +28,18 @@ public class RoutineRepository {
     }
 
     public void save(Routine routine) {
-
         dataSource.putRoutine(routine);
+    }
+
+    public void setRoutineGoalTime(int id, @NonNull Integer time) {
+        Routine routine = dataSource.getRoutineSubject(id).getValue();
+        routine.setGoalTime(time);
+
+    }
+
+    public int getRoutineTime(int id) {
+        Routine routine = dataSource.getRoutineSubject(id).getValue();
+        return routine.getGoalTime();
     }
 
 }

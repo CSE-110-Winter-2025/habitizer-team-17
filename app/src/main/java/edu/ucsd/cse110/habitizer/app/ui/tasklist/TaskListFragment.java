@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.SetGoalTimeDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
@@ -61,12 +63,18 @@ public class TaskListFragment extends Fragment {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
-        // when time changes, update UI, as long as timer is started
-//        activityModel.getCurrentTime().observe(o -> {
-//                view.timerDisplay.setText(o);
-//        });
+        activityModel.getGoalTimeDisplay().observe(goalTime -> {
+            if (goalTime != null) {
+                Log.d("TaskListFragment", "Goal time display updated in TaskListFragment: " + goalTime);
+                view.goalTime.setText(goalTime);
+            } else {
+                Log.d("TaskListFragment", "Goal time display is NULL, not updating UI.");
+            }
+        });
 
-        //
+
+        // view.goalTime.setText(activityModel.getGoalTimeDisplay().getValue());
+
         activityModel.getIsTimerRunning().observe(isRunning -> {
             view.startButton.setEnabled(!isRunning);
             view.stopButton.setEnabled(isRunning);
@@ -86,6 +94,11 @@ public class TaskListFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 }
         );
+
+        view.setGoalTime.setOnClickListener(v -> {
+            var dialogFragment = SetGoalTimeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "SetGoalTimeDialogFragment");
+        });
 
         return view.getRoot();
     }

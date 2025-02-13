@@ -20,6 +20,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.TaskRepository;
 import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
+import edu.ucsd.cse110.observables.Subject;
 
 public class MainViewModel extends ViewModel {
     private static final String LOG_TAG = "MainViewModel";
@@ -41,6 +42,9 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<String> completedTime;
     private final MutableSubject<Boolean> isTimerRunning;
     private final MutableSubject<Boolean> isShowingMorning;
+    private final MutableSubject<Integer> goalTime;
+    private final MutableSubject<String> goalTimeDisplay;
+
     // TODO: CITE
     // Handler for updating the current time on the main thread
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -85,6 +89,8 @@ public class MainViewModel extends ViewModel {
         this.currentTime = new PlainMutableSubject<>();
         this.currentTimeDisplay = new PlainMutableSubject<>();
         this.timer = new CustomTimer();
+        this.goalTime = new PlainMutableSubject<>();
+        this.goalTimeDisplay = new PlainMutableSubject<>();
         this.currentTime.setValue("0m");
         isShowingMorning.setValue(true);
         isTimerRunning.setValue(false);
@@ -118,6 +124,7 @@ public class MainViewModel extends ViewModel {
                 ordering.add(routine.getTasks().get(i).id());
             }
             title.setValue(routine.getName());
+            goalTime.setValue(routine.getGoalTime());
             taskOrdering.setValue(ordering);
         });
 
@@ -136,6 +143,17 @@ public class MainViewModel extends ViewModel {
             if (time == null) return;
             updateCurrentTimeDisplay(currentTime.getValue());
         });
+
+        goalTime.observe(time -> {
+            if (time == null) {
+                Log.e(LOG_TAG, "goalTime.observe() triggered but time is NULL!");
+                return;
+            }
+
+            Log.d(LOG_TAG, "goalTime.observe() triggered: " + time);
+            updateGoalTimeDisplay(time);
+        });
+
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
@@ -151,6 +169,14 @@ public class MainViewModel extends ViewModel {
     private void updateTitle(boolean isShowingMorning) {
         String routineTitle = isShowingMorning ? "Morning Routine" : "Evening Routine";
         title.setValue(routineTitle);
+    }
+
+    public MutableSubject<Boolean> getIsShowingMorning() {
+        return this.isShowingMorning;
+    }
+
+    public MutableSubject<Integer> getGoalTime() {
+        return goalTime;
     }
 
     private void updateCurrentTimeDisplay(String currentTime) {
@@ -184,6 +210,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public MutableSubject<String> getTitle() {
+        Log.d("MainViewModel", "This is from getTitle");
         return title;
     }
 
@@ -201,6 +228,42 @@ public class MainViewModel extends ViewModel {
 
     public MutableSubject<String> getCurrentTime() {
         return currentTime;
+    }
+
+    public void setRoutineGoalTime(int id, Integer time) {
+
+        Log.d(LOG_TAG, "Setting goal time for routine " + id + " to " + time);
+        routineRepository.setRoutineGoalTime(id, time);
+
+        // Fetch the updated value to confirm it was stored correctly
+        int updatedTime = getRoutineGoalTime(id);
+        Log.d(LOG_TAG, "Fetched goalTime from repository after update: " + updatedTime);
+
+        goalTime.setValue(updatedTime);  // 🔹 Ensure observers get triggered
+    }
+    
+    public int getRoutineGoalTime(int id) {
+        int time = routineRepository.getRoutineTime(id);
+        Log.d(LOG_TAG, "getRoutineGoalTime: Retrieved goal time = " + time);
+        return time;
+    }
+
+
+    public void updateGoalTimeDisplay(int time) {
+        String newGoalTimeDisplay = time + "m"; // Ensure correct formatting
+
+        if (goalTimeDisplay.getValue() == null || !goalTimeDisplay.getValue().equals(newGoalTimeDisplay)) {
+            Log.d(LOG_TAG, "Updating goalTimeDisplay to: " + newGoalTimeDisplay);
+            goalTimeDisplay.setValue(newGoalTimeDisplay);
+        } else {
+            Log.d(LOG_TAG, "Skipping redundant goalTimeDisplay update.");
+        }
+    }
+
+
+    public MutableSubject<String> getGoalTimeDisplay() {
+        Log.d("MainViewModel", "This is from goalTimeDisplay");
+        return goalTimeDisplay;
     }
 
     @Override
