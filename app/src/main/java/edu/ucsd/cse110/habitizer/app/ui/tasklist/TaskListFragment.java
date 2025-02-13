@@ -41,8 +41,8 @@ public class TaskListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize the Model
-        var modelOwner = this;
+        // Use the activity as the model owner
+        var modelOwner = requireActivity(); // instead of 'this'
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
@@ -63,17 +63,7 @@ public class TaskListFragment extends Fragment {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
-        activityModel.getGoalTimeDisplay().observe(goalTime -> {
-            if (goalTime != null) {
-                Log.d("TaskListFragment", "Goal time display updated in TaskListFragment: " + goalTime);
-                view.goalTime.setText(goalTime);
-            } else {
-                Log.d("TaskListFragment", "Goal time display is NULL, not updating UI.");
-            }
-        });
-
-
-        // view.goalTime.setText(activityModel.getGoalTimeDisplay().getValue());
+        activityModel.getGoalTimeDisplay().observe(goalTime -> view.goalTime.setText(goalTime));
 
         activityModel.getIsTimerRunning().observe(isRunning -> {
             view.startButton.setEnabled(!isRunning);

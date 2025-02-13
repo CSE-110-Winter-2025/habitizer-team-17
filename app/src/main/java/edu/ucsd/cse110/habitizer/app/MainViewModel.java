@@ -54,10 +54,7 @@ public class MainViewModel extends ViewModel {
         public void run() {
             if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
                 String formatted = timer.getFormattedTime();
-                Log.d("MainViewModel", "Updating currentTime: " + formatted);
                 currentTime.setValue(formatted);
-                // Log.d("MainViewModel", "Updating currentTime: " + currentTime.getValue());
-                // Log.d("MainViewModel", "Display: " + currentTimeDisplay.getValue());
                 handler.postDelayed(this, 1000);
             }
         }
@@ -145,15 +142,10 @@ public class MainViewModel extends ViewModel {
         });
 
         goalTime.observe(time -> {
-            if (time == null) {
-                Log.e(LOG_TAG, "goalTime.observe() triggered but time is NULL!");
-                return;
-            }
-
-            Log.d(LOG_TAG, "goalTime.observe() triggered: " + time);
+            if (time == null) return;
+            goalTimeDisplay.setValue(time.toString());
             updateGoalTimeDisplay(time);
         });
-
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
@@ -184,9 +176,9 @@ public class MainViewModel extends ViewModel {
     }
 
     public void startTimer() {
-        timer.reset();                    // Reset timer to 0 before starting
-        completedTime.setValue("00:00");   // Reset display time
-        timer.start();                    // Start the timer
+        timer.reset();
+        completedTime.setValue("00:00");
+        timer.start();
         isTimerRunning.setValue(true);
         // Start the periodic update of currentTime
         handler.post(updateCurrentTimeRunnable);
@@ -205,7 +197,6 @@ public class MainViewModel extends ViewModel {
 
     public void forwardTimer() {
         timer.forward();
-        // timer.forwardElapsedTime();
         currentTimeDisplay.setValue(timer.getFormattedTime());
     }
 
@@ -231,38 +222,22 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setRoutineGoalTime(int id, Integer time) {
-
-        Log.d(LOG_TAG, "Setting goal time for routine " + id + " to " + time);
         routineRepository.setRoutineGoalTime(id, time);
-
-        // Fetch the updated value to confirm it was stored correctly
-        int updatedTime = getRoutineGoalTime(id);
-        Log.d(LOG_TAG, "Fetched goalTime from repository after update: " + updatedTime);
-
-        goalTime.setValue(updatedTime);  // 🔹 Ensure observers get triggered
+        goalTime.setValue(getRoutineGoalTime(id));
     }
-    
+
     public int getRoutineGoalTime(int id) {
-        int time = routineRepository.getRoutineTime(id);
-        Log.d(LOG_TAG, "getRoutineGoalTime: Retrieved goal time = " + time);
-        return time;
+        return routineRepository.getRoutineTime(id);
     }
-
 
     public void updateGoalTimeDisplay(int time) {
-        String newGoalTimeDisplay = time + "m"; // Ensure correct formatting
-
-        if (goalTimeDisplay.getValue() == null || !goalTimeDisplay.getValue().equals(newGoalTimeDisplay)) {
-            Log.d(LOG_TAG, "Updating goalTimeDisplay to: " + newGoalTimeDisplay);
-            goalTimeDisplay.setValue(newGoalTimeDisplay);
-        } else {
-            Log.d(LOG_TAG, "Skipping redundant goalTimeDisplay update.");
-        }
+        String newGoalTimeDisplay = time + "m";
+        goalTimeDisplay.setValue(newGoalTimeDisplay + " ");
+        goalTimeDisplay.setValue(newGoalTimeDisplay);
     }
 
 
     public MutableSubject<String> getGoalTimeDisplay() {
-        Log.d("MainViewModel", "This is from goalTimeDisplay");
         return goalTimeDisplay;
     }
 
