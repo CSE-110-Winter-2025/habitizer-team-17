@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
@@ -42,13 +43,14 @@ public class TaskListFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Initialize the Model
-        var modelOwner = this;
+        var modelOwner = requireActivity();
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
         this.adapter = new TaskListAdapter(requireContext(), List.of());
+
         activityModel.getOrderedTasks().observe(tasks -> {
             if (tasks == null) return;
             adapter.clear();
@@ -62,24 +64,16 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
-        activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
+
+        activityModel.getTitle().observe(title -> view.displayedTitle.setText(title));
         view.nextButton.setOnClickListener(v -> {
-                    activityModel.nextRoutine();
-                    adapter.clear();
-                    ArrayList<Task> taskAdapterList = new ArrayList<>(activityModel.getOrderedTasks().getValue());
-                    adapter.addAll(taskAdapterList);
-                    adapter.notifyDataSetChanged();
-                }
-        );
+            activityModel.nextRoutine();
+        });
 
         view.startButton.setOnClickListener(v -> {
 
-            var app = (HabitizerApplication) getActivity().getApplication();
+            var app = (HabitizerApplication) requireActivity().getApplication();
             app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
-//            getActivity().getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .replace(R.id.fragment_container, RoutineTaskFragment.newInstance())
-//                    .commit();
         });
 
         return view.getRoot();

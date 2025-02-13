@@ -42,7 +42,6 @@ public class MainViewModel extends ViewModel {
     private final MutableLiveData<Screen> screen = new MutableLiveData<>();
 
 
-
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
@@ -69,10 +68,10 @@ public class MainViewModel extends ViewModel {
 
         routineRepository.findAll().observe(
                 routines -> {
-                    if(routines == null) return;
+                    if (routines == null) return;
 
                     var ordering = new ArrayList<Integer>();
-                    for(int i = 0; i < routines.size(); i++){
+                    for (int i = 0; i < routines.size(); i++) {
                         ordering.add(routines.get(i).id());
                     }
                     routineOrdering.setValue(ordering);
@@ -89,12 +88,15 @@ public class MainViewModel extends ViewModel {
                 routines.add(routine);
             }
             this.orderedRoutines.setValue(routines);
+        });
+
+        orderedRoutines.observe(routines -> {
+            if (routines == null) return;
             currentRoutine.setValue(routines.get(0));
         });
 
 
-
-        // Initialize ordering when tasks are loaded
+        // Initialize task ordering for current routine
         currentRoutine.observe(routine -> {
             if (routine == null) return;
 
@@ -102,8 +104,13 @@ public class MainViewModel extends ViewModel {
             for (int i = 0; i < routine.tasks().size(); i++) {
                 ordering.add(routine.tasks().get(i).id());
             }
-            title.setValue(routine.name());
             taskOrdering.setValue(ordering);
+        });
+
+        // Change title when current routine changes
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
+            title.setValue(routine.name());
         });
 
 
@@ -123,16 +130,20 @@ public class MainViewModel extends ViewModel {
 
 
         currentRoutine.observe(routine -> {
-            if(routine == null) return;
+            if (routine == null) return;
             List<ActiveTask> activeTasks = new ArrayList<>();
-            for(var task: routine.tasks()){
+            for (var task : routine.tasks()) {
                 ActiveTask newActiveTask = new ActiveTask(task, false);
                 activeTasks.add(newActiveTask);
-                activeTaskRepository.save(newActiveTask);
-            };
+            }
 
             activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
+        });
 
+        activeRoutine.observe(routine -> {
+            if (routine == null) return;
+            System.out.println(routine.routine().name());
+            System.out.println(routine.activeTasks().get(0).task().name());
         });
     }
 
@@ -140,12 +151,12 @@ public class MainViewModel extends ViewModel {
         return orderedTasks;
     }
 
-    public MutableSubject<ActiveRoutine> getActiveRoutine(){
+    public MutableSubject<ActiveRoutine> getActiveRoutine() {
         return activeRoutine;
     }
 
     public void nextRoutine() {
-        if(this.routineOrdering.getValue() == null){
+        if (this.routineOrdering.getValue() == null) {
             return;
         }
         var newOrdering = RoutineList.rotateOrdering(routineOrdering.getValue(), 1);
@@ -153,8 +164,8 @@ public class MainViewModel extends ViewModel {
         routineOrdering.setValue(newOrdering);
     }
 
-    public void checkTask(Integer id){
-        if(this.activeRoutine.getValue() == null){
+    public void checkTask(Integer id) {
+        if (this.activeRoutine.getValue() == null) {
             return;
         }
         var task = activeTaskRepository.find(id).getValue();
@@ -167,11 +178,11 @@ public class MainViewModel extends ViewModel {
         return this.getCurrentRoutine();
     }
 
-    public void setScreen(Screen screen){
+    public void setScreen(Screen screen) {
         this.screen.setValue(screen);
     }
 
-    public MutableLiveData<Screen> getScreen(){
+    public MutableLiveData<Screen> getScreen() {
         return this.screen;
     }
 

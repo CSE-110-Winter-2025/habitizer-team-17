@@ -18,6 +18,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
     Consumer<Integer> onCheckedClick;
+
     public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
@@ -49,10 +50,10 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
-        if(task.checked()){
+        if (task.checked()) {
             binding.checkTask.setEnabled(false);
         }
-        binding.checkTask.setOnClickListener(view->{
+        binding.checkTask.setOnClickListener(view -> {
             var id = task.task().id();
             assert id != null;
             onCheckedClick.accept(id);
@@ -76,7 +77,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         assert task != null;
 
         var id = task.task().id();
-        assert  id != null;
+        assert id != null;
 
         return id;
     }

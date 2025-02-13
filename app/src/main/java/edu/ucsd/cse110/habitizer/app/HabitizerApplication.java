@@ -16,13 +16,13 @@ public class HabitizerApplication extends Application {
     private InMemoryDataSource dataSource;
     private RoutineRepository routineRepository;
 
-    private MutableLiveData<Screen> screen;
-
     private TaskRepository taskRepository;
 
     private ActiveRoutineRepository activeRoutineRepository;
 
     private ActiveTaskRepository activeTaskRepository;
+
+    private MutableLiveData<Screen> screen;
 
     @Override
     public void onCreate() {
@@ -34,15 +34,19 @@ public class HabitizerApplication extends Application {
         this.activeRoutineRepository = new ActiveRoutineRepository(dataSource);
         this.activeTaskRepository = new ActiveTaskRepository(dataSource);
         this.screen = new MutableLiveData<>(Screen.PREVIEW_SCREEN);
-
     }
 
     public RoutineRepository getRoutineRepository() {
         return routineRepository;
     }
-    public TaskRepository getTaskRepository(){return taskRepository; }
 
-    public ActiveRoutineRepository getActiveRoutineRepository(){return activeRoutineRepository; }
+    public TaskRepository getTaskRepository() {
+        return taskRepository;
+    }
+
+    public ActiveRoutineRepository getActiveRoutineRepository() {
+        return activeRoutineRepository;
+    }
 
     public MutableLiveData<Screen> getScreen() {
         return screen;

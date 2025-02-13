@@ -41,7 +41,7 @@ public class RoutineTaskFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         // Initialize the Model
-        var modelOwner = this;
+        var modelOwner = requireActivity();
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
@@ -64,7 +64,10 @@ public class RoutineTaskFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = RoutineScreenBinding.inflate(inflater, container, false);
         view.activeList.setAdapter(adapter);
-        activityModel.getTitle().observe(o -> view.routineTitle.setText(activityModel.getTitle().getValue()));
+        activityModel.getActiveRoutine().observe(activeRoutine -> {
+            if (activeRoutine == null) return;
+            view.routineTitle.setText(activeRoutine.routine().name());
+        });
 
         return view.getRoot();
     }
