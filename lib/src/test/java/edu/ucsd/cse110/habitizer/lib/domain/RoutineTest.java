@@ -4,11 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 public class RoutineTest {
     public final static List<Task> tasks = List.of(
@@ -24,7 +20,7 @@ public class RoutineTest {
 
     @Test
     public void getExpectedName() {
-        assertEquals("expectedRoutine", expectedRoutine.getName());
+        assertEquals("expectedRoutine", expectedRoutine.name());
     }
 
     @Test
@@ -35,7 +31,7 @@ public class RoutineTest {
 
     @Test
     public void getTaskList() {
-        assertEquals(tasks, expectedRoutine.getTasks());
+        assertEquals(tasks, expectedRoutine.tasks());
     }
 
     @Test

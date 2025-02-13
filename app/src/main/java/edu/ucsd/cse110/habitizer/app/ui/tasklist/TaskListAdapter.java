@@ -43,7 +43,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         }
 
         // Populate the view with the task
-        binding.taskName.setText(task.getName());
+        binding.taskName.setText(task.name());
         return binding.getRoot();
     }
 

@@ -2,15 +2,11 @@ package edu.ucsd.cse110.habitizer.app;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
-import android.view.View;
-
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
@@ -103,10 +99,10 @@ public class MainViewModel extends ViewModel {
             if (routine == null) return;
 
             var ordering = new ArrayList<Integer>();
-            for (int i = 0; i < routine.getTasks().size(); i++) {
-                ordering.add(routine.getTasks().get(i).id());
+            for (int i = 0; i < routine.tasks().size(); i++) {
+                ordering.add(routine.tasks().get(i).id());
             }
-            title.setValue(routine.getName());
+            title.setValue(routine.name());
             taskOrdering.setValue(ordering);
         });
 
@@ -129,7 +125,7 @@ public class MainViewModel extends ViewModel {
         currentRoutine.observe(routine -> {
             if(routine == null) return;
             List<ActiveTask> activeTasks = new ArrayList<>();
-            for(var task: routine.getTasks()){
+            for(var task: routine.tasks()){
                 ActiveTask newActiveTask = new ActiveTask(task, false);
                 activeTasks.add(newActiveTask);
                 activeTaskRepository.save(newActiveTask);
@@ -152,7 +148,7 @@ public class MainViewModel extends ViewModel {
         if(this.routineOrdering.getValue() == null){
             return;
         }
-        var newOrdering = RoutineList.rotateRoutine(routineOrdering.getValue(), 1);
+        var newOrdering = RoutineList.rotateOrdering(routineOrdering.getValue(), 1);
 
         routineOrdering.setValue(newOrdering);
     }
@@ -162,9 +158,9 @@ public class MainViewModel extends ViewModel {
             return;
         }
         var task = activeTaskRepository.find(id).getValue();
-        task = task.setChecked(!task.isChecked());
+        task = task.withChecked(!task.checked());
         activeTaskRepository.save(task);
-        activeRoutine.setValue(activeRoutine.getValue().setActiveTask(task));
+        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(task));
     }
 
     public MutableSubject<Routine> getCurrentRoutine() {

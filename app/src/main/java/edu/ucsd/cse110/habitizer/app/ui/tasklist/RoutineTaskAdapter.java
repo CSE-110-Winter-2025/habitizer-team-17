@@ -47,9 +47,9 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         }
 
         // Populate the view with the task
-        binding.checkTask.setText(task.task().getName());
-        binding.checkTask.setChecked(task.isChecked());
-        if(task.isChecked()){
+        binding.checkTask.setText(task.task().name());
+        binding.checkTask.setChecked(task.checked());
+        if(task.checked()){
             binding.checkTask.setEnabled(false);
         }
         binding.checkTask.setOnClickListener(view->{

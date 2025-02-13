@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpObservers(){
-        System.out.println("set up observers");
         var app = (HabitizerApplication) getApplication();
         screen = app.getScreen();
         screen.observeForever(screen -> {
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void swapFragments(Screen screen){
-        System.out.println("it is called, screen is: " + screen.toString());
         Fragment fragment;
         switch(screen){
 
