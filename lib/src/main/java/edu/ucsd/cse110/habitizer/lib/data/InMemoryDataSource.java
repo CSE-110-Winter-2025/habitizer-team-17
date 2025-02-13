@@ -10,6 +10,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
+
 public class InMemoryDataSource {
 
     private final Map<Integer, Task> tasks = new HashMap<>();
@@ -23,7 +24,7 @@ public class InMemoryDataSource {
     private final Map<Integer, MutableSubject<ActiveTask>> activeTaskSubjects = new HashMap<>();
     private final Map<Integer, MutableSubject<Routine>> routineSubjects = new HashMap<>();
     private final MutableSubject<List<Routine>> allRoutinesSubject = new PlainMutableSubject<>();
-//
+    //
     private final MutableSubject<List<Routine>> routineListSubject = new PlainMutableSubject<>();
 
     private final MutableSubject<List<ActiveTask>> allActiveTasksSubject = new PlainMutableSubject<>();
@@ -79,12 +80,16 @@ public class InMemoryDataSource {
         return routineSubjects.get(id);
     }
 
-    public List<ActiveTask> getActiveTasks() { return List.copyOf(activeTasks.values()); }
+    public List<ActiveTask> getActiveTasks() {
+        return List.copyOf(activeTasks.values());
+    }
 
-    public ActiveTask getActiveTask(int id) { return activeTasks.get(id); }
+    public ActiveTask getActiveTask(int id) {
+        return activeTasks.get(id);
+    }
 
     public MutableSubject<ActiveTask> getActiveTaskSubject(int id) {
-        if(!activeTaskSubjects.containsKey(id)){
+        if (!activeTaskSubjects.containsKey(id)) {
             var subject = new PlainMutableSubject<ActiveTask>();
             subject.setValue(getActiveTask(id));
             activeTaskSubjects.put(id, subject);
@@ -92,11 +97,12 @@ public class InMemoryDataSource {
         }
         return activeTaskSubjects.get(id);
     }
+
     public MutableSubject<List<Routine>> getAllRoutinesSubject() {
         return allRoutinesSubject;
     }
 
-    public MutableSubject<List<ActiveTask>> getAllActiveTasksSubject(){
+    public MutableSubject<List<ActiveTask>> getAllActiveTasksSubject() {
         return allActiveTasksSubject;
     }
 
@@ -110,40 +116,42 @@ public class InMemoryDataSource {
 
     public void putRoutineList(List<Routine> routineList) {
         routineListSubject.setValue(routineList);
-    };
+    }
 
-    public void putTaskList(List<Task> tasks){
-        for(var task: tasks){
+    ;
+
+    public void putTaskList(List<Task> tasks) {
+        for (var task : tasks) {
             this.putTask(task);
         }
     }
 
-    public void putActiveTask(ActiveTask activeTask){
-     activeTasks.put(activeTask.task().id(), activeTask);
-     if(activeTaskSubjects.containsKey(activeTask.task().id())) {
-         activeTaskSubjects.get(activeTask.task().id()).setValue(activeTask);
-     }
+    public void putActiveTask(ActiveTask activeTask) {
+        activeTasks.put(activeTask.task().id(), activeTask);
+        if (activeTaskSubjects.containsKey(activeTask.task().id())) {
+            activeTaskSubjects.get(activeTask.task().id()).setValue(activeTask);
+        }
     }
 
-    public void putActiveTaskList(List<ActiveTask> activeTasks){
-        for(var aTask: activeTasks){
+    public void putActiveTaskList(List<ActiveTask> activeTasks) {
+        for (var aTask : activeTasks) {
             this.putActiveTask(aTask);
         }
     }
 
-    public void putActiveRoutine(ActiveRoutine activeRoutine){
+    public void putActiveRoutine(ActiveRoutine activeRoutine) {
         this.activeRoutine = activeRoutine;
-        if(activeRoutineMutableSubject != null) {
+        if (activeRoutineMutableSubject != null) {
             activeRoutineMutableSubject.setValue(activeRoutine);
         }
     }
 
-    public ActiveRoutine getActiveRoutine(){
+    public ActiveRoutine getActiveRoutine() {
         return activeRoutine;
     }
 
-    public MutableSubject<ActiveRoutine> getActiveRoutineSubject(){
-        if(activeRoutineMutableSubject == null){
+    public MutableSubject<ActiveRoutine> getActiveRoutineSubject() {
+        if (activeRoutineMutableSubject == null) {
             activeRoutineMutableSubject = new PlainMutableSubject<>();
             activeRoutineMutableSubject.setValue(activeRoutine);
         }
@@ -152,21 +160,21 @@ public class InMemoryDataSource {
 
 
     public final static List<Task> MORNING_TASKS = List.of(
-            new Task(0,"Shower"),
+            new Task(0, "Shower"),
             new Task(1, "Brush Teeth"),
-            new Task(2,"Dress"),
-            new Task(3,"Make Coffee"),
-            new Task(4,"Make Lunch"),
-            new Task(5,"Dinner Prep"),
-            new Task(6,"Pack Bag")
+            new Task(2, "Dress"),
+            new Task(3, "Make Coffee"),
+            new Task(4, "Make Lunch"),
+            new Task(5, "Dinner Prep"),
+            new Task(6, "Pack Bag")
     );
 
     public final static List<Task> EVENING_TASKS = List.of(
-            new Task(7,"Pack Balls")
+            new Task(7, "Pack Balls")
     );
-    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS);
+    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine", MORNING_TASKS);
 
-    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS);
+    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine", EVENING_TASKS);
 
     private static ActiveRoutine activeRoutine = null;
 

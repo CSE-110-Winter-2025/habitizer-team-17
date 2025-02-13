@@ -14,7 +14,7 @@ public class ActiveRoutineRepository {
     }
 
 
-    public MutableSubject<ActiveRoutine> get () {
+    public MutableSubject<ActiveRoutine> get() {
 
         return dataSource.getActiveRoutineSubject();
     }

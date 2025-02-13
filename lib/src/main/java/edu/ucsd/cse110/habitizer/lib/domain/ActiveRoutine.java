@@ -15,6 +15,7 @@ public class ActiveRoutine {
         this.routine = routine;
         this.activeTasks = activeTasks;
     }
+
     public @NonNull Routine routine() {
         return routine;
     }

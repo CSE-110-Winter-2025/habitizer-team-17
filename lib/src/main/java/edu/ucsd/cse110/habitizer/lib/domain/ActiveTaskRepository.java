@@ -8,7 +8,7 @@ import edu.ucsd.cse110.observables.MutableSubject;
 public class ActiveTaskRepository {
     private final InMemoryDataSource dataSource;
 
-    public ActiveTaskRepository(InMemoryDataSource dataSource){
+    public ActiveTaskRepository(InMemoryDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -16,7 +16,7 @@ public class ActiveTaskRepository {
         return dataSource.getActiveTasks().size();
     }
 
-    public MutableSubject<ActiveTask> find (int id) {
+    public MutableSubject<ActiveTask> find(int id) {
 
         return dataSource.getActiveTaskSubject(id);
     }

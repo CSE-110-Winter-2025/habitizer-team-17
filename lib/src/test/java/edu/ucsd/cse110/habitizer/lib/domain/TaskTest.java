@@ -12,11 +12,11 @@ public class TaskTest {
 
     @Before
     public void setup() {
-        TASK_A = new Task(1,"A");
+        TASK_A = new Task(1, "A");
     }
 
     @Test
-    public void getNameTest()  {
+    public void getNameTest() {
         var expected = "A";
         assertEquals(expected, TASK_A.name());
     }
@@ -29,19 +29,19 @@ public class TaskTest {
     }
 
     @Test
-    public void getIdTest()  {
+    public void getIdTest() {
         Integer expected = 1;
         assertEquals(expected, TASK_A.id());
     }
 
     @Test
     public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task(2,null));
+        assertThrows(IllegalArgumentException.class, () -> new Task(2, null));
     }
 
     @Test
     public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task(2,""));
+        assertThrows(IllegalArgumentException.class, () -> new Task(2, ""));
     }
 }
 

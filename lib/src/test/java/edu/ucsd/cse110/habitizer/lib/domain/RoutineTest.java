@@ -8,13 +8,13 @@ import java.util.List;
 
 public class RoutineTest {
     public final static List<Task> tasks = List.of(
-            new Task(0,"Shower"),
+            new Task(0, "Shower"),
             new Task(1, "Brush Teeth"),
-            new Task(2,"Dress"),
-            new Task(3,"Make Coffee"),
-            new Task(4,"Make Lunch"),
-            new Task(5,"Dinner Prep"),
-            new Task(6,"Pack Bag")
+            new Task(2, "Dress"),
+            new Task(3, "Make Coffee"),
+            new Task(4, "Make Lunch"),
+            new Task(5, "Dinner Prep"),
+            new Task(6, "Pack Bag")
     );
     public final static Routine expectedRoutine = new Routine(0, "expectedRoutine", tasks);
 
@@ -36,16 +36,16 @@ public class RoutineTest {
 
     @Test
     public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null,tasks));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null, tasks));
     }
 
     @Test
     public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"",tasks));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2, "", tasks));
     }
 
     @Test
     public void nullTasksTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"test", null));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2, "test", null));
     }
 }
