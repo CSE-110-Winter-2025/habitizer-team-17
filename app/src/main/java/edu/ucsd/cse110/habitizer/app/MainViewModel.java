@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
@@ -92,6 +93,7 @@ public class MainViewModel extends ViewModel {
         isShowingMorning.setValue(true);
         isTimerRunning.setValue(false);
         completedTime.setValue("");
+        loadTasks();
 
         routineRepository.findAll().observe(routines -> {
             if (routines == null) return;
@@ -147,9 +149,24 @@ public class MainViewModel extends ViewModel {
             updateGoalTimeDisplay(time);
         });
     }
+    private void loadTasks() {
+        var tasks = taskRepository.findAll().getValue();
+        if (tasks != null) {
+            orderedTasks.setValue(tasks);
+        }
+    }
 
     public MutableSubject<List<Task>> getOrderedTasks() {
         return orderedTasks;
+    }
+
+    public void toggleTaskCompletion(int taskId) {
+        Task task = taskRepository.find(taskId).getValue();
+        if (task != null) {
+            task.setCompleted(!task.isCompleted());
+            taskRepository.save(task);
+            loadTasks();
+        }
     }
 
     public void nextRoutine() {

@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.observables;
 
+import java.util.function.Consumer;
+
 /**
  * A mutable subject that can be set to a new value.
  * <p>

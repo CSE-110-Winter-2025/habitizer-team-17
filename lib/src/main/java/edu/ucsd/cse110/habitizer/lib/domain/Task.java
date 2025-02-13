@@ -9,6 +9,7 @@ public class Task {
 
     private final @Nullable Integer id;
     private @NonNull String name;
+    private boolean completed;
     // some sort of time field, not ready for this yet
     // ... more fields to come
     public Task(@Nullable Integer id, @NonNull String name) {
@@ -31,6 +32,12 @@ public class Task {
     }
     public void setName(String newName) {
         this.name = newName;
+    }
+    public boolean isCompleted() {
+        return completed;
+    }
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 
     @Override

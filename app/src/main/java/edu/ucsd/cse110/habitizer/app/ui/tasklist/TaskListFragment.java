@@ -90,6 +90,23 @@ public class TaskListFragment extends Fragment {
             dialogFragment.show(getParentFragmentManager(), "SetGoalTimeDialogFragment");
         });
 
+        view.taskList.setOnItemClickListener((parent, view, position, id) -> {
+            Task clickedTask = adapter.getItem(position);
+
+            if (clickedTask != null) {
+                activityModel.toggleTaskCompletion(clickedTask.id()); // Use task.id()
+            }
+        });
+
+        activityModel.getOrderedTasks().observe(tasks -> {
+            if (tasks == null) return;
+
+            adapter.clear();
+            ArrayList<Task> taskAdapterList = new ArrayList<>(tasks);
+            adapter.addAll(taskAdapterList);
+            adapter.notifyDataSetChanged(); // Crucial: Notify adapter of data change
+        });
+
         return view.getRoot();
     }
 }

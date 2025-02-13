@@ -1,6 +1,7 @@
 package edu.ucsd.cse110.habitizer.app.ui.tasklist;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,14 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
 
         // Populate the view with the task
         binding.taskName.setText(task.getName());
+
+        // Apply/Remove Strikethrough
+        if (task.isCompleted()) {
+            binding.taskName.setPaintFlags(binding.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            binding.taskName.setPaintFlags(binding.taskName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+
         return binding.getRoot();
     }
 
