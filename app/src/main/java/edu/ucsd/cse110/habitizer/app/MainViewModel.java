@@ -155,6 +155,7 @@ public class MainViewModel extends ViewModel {
     public void nextRoutine() {
         if (routineOrdering.getValue() == null) return;
         var newOrdering = RoutineList.rotateRoutine(routineOrdering.getValue(), 1);
+        isShowingMorning.setValue(!isShowingMorning.getValue());
         routineOrdering.setValue(newOrdering);
     }
 
