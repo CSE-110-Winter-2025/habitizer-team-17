@@ -8,7 +8,7 @@ public class CustomerTimerTest {
 
     @Before
     public void setUp() {
-        timer = new CustomTimer();
+        timer = new MockTimer();
     }
 
     @Test
@@ -40,8 +40,9 @@ public class CustomerTimerTest {
     @Test
     public void testFastForward() {
         // Enable mock mode
-        timer.forward();
-        timer.forward();
+        MockTimer t = (MockTimer)timer;
+        t.forward();
+        t.forward();
 
         // Timer should advance by 30 seconds
         assertEquals("1m", timer.getFormattedTime());

@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+import edu.ucsd.cse110.habitizer.lib.domain.MockTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineList;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
@@ -46,6 +47,8 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Boolean> isTimerRunning;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
+
+    private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -90,7 +93,11 @@ public class MainViewModel extends ViewModel {
         this.isTimerRunning = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
         this.currentTimeDisplay = new PlainMutableSubject<>();
-        this.timer = new CustomTimer();
+        if(!isMocked) {
+            this.timer = new CustomTimer();
+        } else {
+            this.timer = new MockTimer();
+        }
         this.goalTime = new PlainMutableSubject<>();
         this.goalTimeDisplay = new PlainMutableSubject<>();
         this.currentTime.setValue("0m");
@@ -246,7 +253,8 @@ public class MainViewModel extends ViewModel {
     }
 
     public void forwardTimer() {
-        timer.forward();
+        MockTimer mockedTimer = (MockTimer)timer;
+        mockedTimer.forward();
         currentTimeDisplay.setValue(timer.getFormattedTime());
     }
 
@@ -296,6 +304,10 @@ public class MainViewModel extends ViewModel {
 
     public MutableSubject<Routine> getCurrentRoutine() {
         return currentRoutine;
+    }
+
+    public boolean isMocked(){
+        return isMocked;
     }
 
     @Override

@@ -4,19 +4,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class CustomTimer {
-    private Timer timer;
-    private long elapsedTime;
-    private boolean isRunning;
-    private boolean isMocked;
-    private final int FORWARD_SECONDS = 30;
-    private final int Final_Seconds = 1000;
-    private TimerTask timerTask;
-    private String completedTime;
+    protected Timer timer;
+    protected long elapsedTime;
+    protected boolean isRunning;
+    protected final int Final_Seconds = 1000;
+    protected TimerTask timerTask;
+    protected String completedTime;
 
     public CustomTimer() {
         this.elapsedTime = 0;
         this.isRunning = false;
-        this.isMocked = false;
         this.completedTime = "00:00";
     }
 
@@ -54,17 +51,6 @@ public class CustomTimer {
         }
     }
 
-    public void forward() {
-        elapsedTime += (FORWARD_SECONDS * Final_Seconds);
-        // completedTime = getFormattedTime();
-    }
-
-    public void setMockMode(boolean mock) {
-        if (mock != isMocked) {
-            stop();
-            isMocked = mock;
-        }
-    }
 
     public String getFormattedTime() {
         long totalSeconds = elapsedTime / Final_Seconds;

@@ -77,8 +77,14 @@ public class RoutineTaskFragment extends Fragment {
         activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
 
         // Button click listeners
-        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
-        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+
+        if(activityModel.isMocked()) {
+            view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+            view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        } else {
+            view.fastForwardButton.setVisibility(View.GONE);
+            view.stopButton.setVisibility(View.GONE);
+        }
 
         return view.getRoot();
     }
