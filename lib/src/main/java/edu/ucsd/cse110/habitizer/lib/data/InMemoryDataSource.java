@@ -94,6 +94,8 @@ public class InMemoryDataSource {
         }
     }
 
+    public void setRoutineGoalTime(int id) {}
+
     public final static List<Task> MORNING_TASKS = List.of(
             new Task(0,"Shower"),
             new Task(1, "Brush Teeth"),
@@ -107,9 +109,9 @@ public class InMemoryDataSource {
     public final static List<Task> EVENING_TASKS = List.of(
             new Task(7,"Pack Balls")
     );
-    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS);
+    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS, 20);
 
-    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS);
+    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS, 10);
 
 //
 //    public final static RoutineList DEFAULT_ROUTINE_LIST = new RoutineList(List.of(DEFAULT_ROUTINE));

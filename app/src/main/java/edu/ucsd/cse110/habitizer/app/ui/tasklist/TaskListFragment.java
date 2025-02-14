@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.SetGoalTimeDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
@@ -39,8 +41,8 @@ public class TaskListFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize the Model
-        var modelOwner = this;
+        // Use the activity as the model owner
+        var modelOwner = requireActivity(); // instead of 'this'
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
         var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
         this.activityModel = modelProvider.get(MainViewModel.class);
@@ -61,18 +63,14 @@ public class TaskListFragment extends Fragment {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(o -> view.displayedTitle.setText(activityModel.getTitle().getValue()));
-        activityModel.getCompletedTime().observe(o -> {
-            if (view.timerDisplay != null) {
-                view.timerDisplay.setText(o != null ? o : "00:00");
-            }
-        });
+        activityModel.getGoalTimeDisplay().observe(goalTime -> view.goalTime.setText(goalTime));
 
         activityModel.getIsTimerRunning().observe(isRunning -> {
-            if (view.startButton != null && view.stopButton != null) {
-                view.startButton.setEnabled(!isRunning);
-                view.stopButton.setEnabled(isRunning);
-            }
+            view.startButton.setEnabled(!isRunning);
+            view.stopButton.setEnabled(isRunning);
         });
+
+        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
 
         // Button click listeners
         view.startButton.setOnClickListener(v -> activityModel.startTimer());
@@ -86,6 +84,11 @@ public class TaskListFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 }
         );
+
+        view.setGoalTime.setOnClickListener(v -> {
+            var dialogFragment = SetGoalTimeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "SetGoalTimeDialogFragment");
+        });
 
         return view.getRoot();
     }

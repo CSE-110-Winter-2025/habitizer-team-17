@@ -20,7 +20,7 @@ public class RoutineTest {
             new Task(5,"Dinner Prep"),
             new Task(6,"Pack Bag")
     );
-    public final static Routine expectedRoutine = new Routine(0, "expectedRoutine", tasks);
+    public final static Routine expectedRoutine = new Routine(0, "expectedRoutine", tasks, 44);
 
     @Test
     public void getExpectedName() {
@@ -40,16 +40,32 @@ public class RoutineTest {
 
     @Test
     public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null,tasks));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null,tasks, 44));
     }
 
     @Test
     public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"",tasks));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"",tasks, 44));
     }
 
     @Test
     public void nullTasksTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"test", null));
+        assertThrows(IllegalArgumentException.class, () -> new Routine(2,"test", null, 44));
+    }
+
+
+    @Test
+    public void getGoalTimeTest() {
+        Routine routine = new Routine(2,"test", tasks, 0);
+        var expected = 0;
+        assertEquals(expected, routine.getGoalTime());
+    }
+
+    @Test
+    public void setGoalTimeTest() {
+        Routine routine = new Routine(2,"test", tasks, 0);
+        var expected = 44;
+        routine.setGoalTime(44);
+        assertEquals(expected, routine.getGoalTime());
     }
 }

@@ -12,8 +12,9 @@ public class Routine {
 
     private @NonNull String name;
     private final @Nullable Integer id;
+    private @NonNull Integer goalTime;
 
-    public Routine(@Nullable Integer id, @NonNull String name, @NonNull List<Task> tasks) {
+    public Routine(@Nullable Integer id, @NonNull String name, @NonNull List<Task> tasks, @NonNull Integer goalTime) {
         if (tasks == null) {
             throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
                     "are present");
@@ -27,6 +28,7 @@ public class Routine {
         this.name = name;
         this.tasks = tasks;
         this.id = id;
+        this.goalTime = goalTime;
     }
 
     public Integer id() {
@@ -38,6 +40,14 @@ public class Routine {
 
     public String getName() {
         return this.name;
+    }
+
+    public void setGoalTime(@NonNull Integer time) {
+        this.goalTime = time;
+    }
+
+    public int getGoalTime() {
+        return this.goalTime;
     }
 
     @Override

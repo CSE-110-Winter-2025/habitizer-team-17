@@ -39,11 +39,12 @@ public class CustomerTimerTest {
 
     @Test
     public void testFastForward() {
-        timer.setMockMode(true); // Enable mock mode
+        // Enable mock mode
+        timer.forward();
         timer.forward();
 
         // Timer should advance by 30 seconds
-        assertEquals("00:30", timer.getFormattedTime());
+        assertEquals("1m", timer.getFormattedTime());
     }
 
 }
