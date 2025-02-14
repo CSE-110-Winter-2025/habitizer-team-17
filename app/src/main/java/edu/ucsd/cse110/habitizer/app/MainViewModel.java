@@ -8,10 +8,10 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
-import edu.ucsd.cse110.habitizer.lib.domain.ActiveTaskRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineList;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
@@ -28,7 +28,6 @@ public class MainViewModel extends ViewModel {
 
     private final TaskRepository taskRepository;
 
-    private final ActiveTaskRepository activeTaskRepository;
     // UI state
     private final MutableSubject<List<Integer>> routineOrdering;
     private final MutableSubject<List<Routine>> orderedRoutines;
@@ -39,23 +38,19 @@ public class MainViewModel extends ViewModel {
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
 
-    private final MutableLiveData<Screen> screen = new MutableLiveData<>();
-
-
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
                     creationExtras -> {
                         var app = (HabitizerApplication) creationExtras.get(APPLICATION_KEY);
                         assert app != null;
-                        return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository(), app.getActiveTaskRepository());
+                        return new MainViewModel(app.getRoutineRepository(), app.getTaskRepository());
                     }
             );
 
-    public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository, ActiveTaskRepository activeTaskRepository) {
+    public MainViewModel(RoutineRepository routineRepository, TaskRepository taskRepository) {
         this.routineRepository = routineRepository;
         this.taskRepository = taskRepository;
-        this.activeTaskRepository = activeTaskRepository;
         // Create the observable objects
         this.routineOrdering = new PlainMutableSubject<>();
         this.orderedRoutines = new PlainMutableSubject<>();
@@ -168,22 +163,10 @@ public class MainViewModel extends ViewModel {
         if (this.activeRoutine.getValue() == null) {
             return;
         }
-        var task = activeTaskRepository.find(id).getValue();
-        task = task.withChecked(!task.checked());
-        activeTaskRepository.save(task);
-        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(task));
-    }
-
-    public MutableSubject<Routine> getCurrentRoutine() {
-        return this.getCurrentRoutine();
-    }
-
-    public void setScreen(Screen screen) {
-        this.screen.setValue(screen);
-    }
-
-    public MutableLiveData<Screen> getScreen() {
-        return this.screen;
+        var task = activeRoutine.getValue().activeTasks().stream().filter(activeTask -> Objects.equals(activeTask.task().id(), id)).findFirst();
+        if (task.isEmpty()) return;
+        var checkedTask = task.get().withChecked(true);
+        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
     }
 
     public MutableSubject<String> getTitle() {
