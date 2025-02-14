@@ -5,11 +5,11 @@ import java.util.TimerTask;
 
 public class CustomTimer {
     private Timer timer;
-    private long elapsedTime;
+    public long elapsedTime;
     private boolean isRunning;
     private boolean isMocked;
     private final int FORWARD_SECONDS = 30;
-    private final int Final_Seconds = 1000;
+    public final int Final_Seconds = 1000;
     private TimerTask timerTask;
     private String completedTime;
 
@@ -90,5 +90,8 @@ public class CustomTimer {
         elapsedTime = 0;
         isRunning = false;
         completedTime = "00:00";
+    }
+    public long getElapsedSeconds() {
+        return elapsedTime / Final_Seconds;
     }
 }

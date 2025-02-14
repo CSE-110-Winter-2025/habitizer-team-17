@@ -45,6 +45,7 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Boolean> isShowingMorning;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
+    private long lastCompletionSeconds;
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -93,6 +94,7 @@ public class MainViewModel extends ViewModel {
         isShowingMorning.setValue(true);
         isTimerRunning.setValue(false);
         completedTime.setValue("");
+        this.lastCompletionSeconds = 0;
         loadTasks();
 
         routineRepository.findAll().observe(routines -> {
@@ -163,11 +165,30 @@ public class MainViewModel extends ViewModel {
     public void toggleTaskCompletion(int taskId) {
         Task task = taskRepository.find(taskId).getValue();
         if (task != null) {
-            task.setCompleted(!task.isCompleted());
+            boolean newCompletionState = !task.isCompleted();
+            task.setCompleted(newCompletionState);
+
+            if (newCompletionState && isTimerRunning.getValue()) {
+                // Get current elapsed seconds
+                long currentSeconds = timer.elapsedTime / timer.Final_Seconds;
+
+                // Calculate difference and round up
+                long diffSeconds = currentSeconds - lastCompletionSeconds;
+                long roundedSeconds = ((diffSeconds + 59) / 60) * 60;  // Round up to nearest minute
+
+                // Create temporary timer to format the difference
+                CustomTimer tempTimer = new CustomTimer();
+                tempTimer.elapsedTime = roundedSeconds * timer.Final_Seconds;
+                String relativeTime = tempTimer.getFormattedTime();
+
+                task.setCompletionTime(relativeTime);
+                lastCompletionSeconds = currentSeconds;
+            }
             taskRepository.save(task);
             loadTasks();
         }
     }
+
 
     public void nextRoutine() {
         if (routineOrdering.getValue() == null) return;

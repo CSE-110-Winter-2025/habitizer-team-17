@@ -10,6 +10,7 @@ public class Task {
     private final @Nullable Integer id;
     private @NonNull String name;
     private boolean completed;
+    private String completionTime;
     // some sort of time field, not ready for this yet
     // ... more fields to come
     public Task(@Nullable Integer id, @NonNull String name) {
@@ -21,6 +22,7 @@ public class Task {
         }
         this.name = name;
         this.id = id;
+        this.completionTime = "";
     }
 
     public @Nullable Integer id() {
@@ -38,6 +40,13 @@ public class Task {
     }
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+    public String getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(String completionTime) {
+        this.completionTime = completionTime;
     }
 
     @Override

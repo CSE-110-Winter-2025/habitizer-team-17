@@ -46,13 +46,18 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         // Populate the view with the task
         binding.taskName.setText(task.getName());
 
-        // Apply/Remove Strikethrough
+        //update time and check off task
         if (task.isCompleted()) {
             binding.taskName.setPaintFlags(binding.taskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        } else {
-            binding.taskName.setPaintFlags(binding.taskName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            String completionTime = task.getCompletionTime();
+            if (!completionTime.isEmpty()) {
+                binding.completionTime.setText(completionTime);
+                binding.completionTime.setVisibility(View.VISIBLE);
+            } else {
+                binding.taskName.setPaintFlags(binding.taskName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                binding.completionTime.setVisibility(View.GONE);
+            }
         }
-
         return binding.getRoot();
     }
 
