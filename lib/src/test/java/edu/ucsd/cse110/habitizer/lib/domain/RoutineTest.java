@@ -36,27 +36,16 @@ public class RoutineTest {
 
     @Test
     public void nullNameTest() {
-<<<<<<< HEAD
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2, null, tasks));
-=======
         assertThrows(IllegalArgumentException.class, () -> new Routine(2, null,tasks, 44));
->>>>>>> master
     }
 
     @Test
     public void emptyNameTest() {
-<<<<<<< HEAD
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2, "", tasks));
-=======
         assertThrows(IllegalArgumentException.class, () -> new Routine(2,"",tasks, 44));
->>>>>>> master
     }
 
     @Test
     public void nullTasksTest() {
-<<<<<<< HEAD
-        assertThrows(IllegalArgumentException.class, () -> new Routine(2, "test", null));
-=======
         assertThrows(IllegalArgumentException.class, () -> new Routine(2,"test", null, 44));
     }
 
@@ -64,16 +53,15 @@ public class RoutineTest {
     @Test
     public void getGoalTimeTest() {
         Routine routine = new Routine(2,"test", tasks, 0);
-        var expected = 0;
-        assertEquals(expected, routine.getGoalTime());
+        int expected = 0;
+        assertEquals(expected, routine.goalTime().intValue());
     }
 
     @Test
     public void setGoalTimeTest() {
         Routine routine = new Routine(2,"test", tasks, 0);
-        var expected = 44;
-        routine.setGoalTime(44);
-        assertEquals(expected, routine.getGoalTime());
->>>>>>> master
+        int expected = 44;
+        var newRoutine = routine.withGoalTime(44);
+        assertEquals(expected, newRoutine.goalTime().intValue());
     }
 }
