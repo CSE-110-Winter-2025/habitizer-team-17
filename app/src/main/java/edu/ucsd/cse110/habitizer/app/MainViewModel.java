@@ -276,7 +276,6 @@ public class MainViewModel extends ViewModel {
         if (routine == null) return;
         var newRoutine = routine.withGoalTime(time);
         routineRepository.save(newRoutine);
-        goalTime.setValue(getRoutineGoalTime(id));
     }
 
     public int getRoutineGoalTime(int id) {

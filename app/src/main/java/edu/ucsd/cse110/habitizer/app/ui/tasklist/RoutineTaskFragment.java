@@ -69,6 +69,17 @@ public class RoutineTaskFragment extends Fragment {
             view.routineTitle.setText(activeRoutine.routine().name());
         });
 
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            if (isRunning == null) return;
+            view.stopButton.setEnabled(isRunning);
+        });
+
+        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
+
+        // Button click listeners
+        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+
         return view.getRoot();
     }
 }

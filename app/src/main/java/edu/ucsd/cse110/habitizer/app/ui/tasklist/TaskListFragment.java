@@ -70,17 +70,6 @@ public class TaskListFragment extends Fragment {
         activityModel.getTitle().observe(title -> view.displayedTitle.setText(title));
         activityModel.getGoalTimeDisplay().observe(goalTime -> view.goalTime.setText(goalTime));
 
-        activityModel.getIsTimerRunning().observe(isRunning -> {
-            view.startButton.setEnabled(!isRunning);
-            view.stopButton.setEnabled(isRunning);
-        });
-
-        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
-
-        // Button click listeners
-        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
-        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
-
         view.nextButton.setOnClickListener(v -> {
             activityModel.nextRoutine();
         });
