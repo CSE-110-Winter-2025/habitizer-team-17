@@ -11,7 +11,10 @@ import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineList;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
@@ -41,7 +44,6 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<String> currentTimeDisplay;
     private final MutableSubject<String> completedTime;
     private final MutableSubject<Boolean> isTimerRunning;
-    private final MutableSubject<Boolean> isShowingMorning;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
 
@@ -60,6 +62,8 @@ public class MainViewModel extends ViewModel {
         }
     };
 
+    private final MutableSubject<ActiveRoutine> activeRoutine;
+
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
@@ -76,11 +80,12 @@ public class MainViewModel extends ViewModel {
         // Initialize observables
         this.routineOrdering = new PlainMutableSubject<>();
         this.orderedRoutines = new PlainMutableSubject<>();
-        this.isShowingMorning = new PlainMutableSubject<>();
         this.taskOrdering = new PlainMutableSubject<>();
         this.orderedTasks = new PlainMutableSubject<>();
         this.currentRoutine = new PlainMutableSubject<>();
         this.title = new PlainMutableSubject<>();
+        this.activeRoutine = new PlainMutableSubject<>();
+
         this.completedTime = new PlainMutableSubject<>();
         this.isTimerRunning = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
@@ -89,18 +94,21 @@ public class MainViewModel extends ViewModel {
         this.goalTime = new PlainMutableSubject<>();
         this.goalTimeDisplay = new PlainMutableSubject<>();
         this.currentTime.setValue("0m");
-        isShowingMorning.setValue(true);
         isTimerRunning.setValue(false);
         completedTime.setValue("");
 
-        routineRepository.findAll().observe(routines -> {
-            if (routines == null) return;
-            var ordering = new ArrayList<Integer>();
-            for (int i = 0; i < routines.size(); i++) {
-                ordering.add(routines.get(i).id());
-            }
-            routineOrdering.setValue(ordering);
-        });
+
+        routineRepository.findAll().observe(
+                routines -> {
+                    if (routines == null) return;
+
+                    var ordering = new ArrayList<Integer>();
+                    for (int i = 0; i < routines.size(); i++) {
+                        ordering.add(routines.get(i).id());
+                    }
+                    routineOrdering.setValue(ordering);
+                }
+        );
 
         routineOrdering.observe(ordering -> {
             if (ordering == null) return;
@@ -110,19 +118,36 @@ public class MainViewModel extends ViewModel {
                 if (routine == null) return;
                 routines.add(routine);
             }
-            orderedRoutines.setValue(routines);
+            this.orderedRoutines.setValue(routines);
+        });
+
+        orderedRoutines.observe(routines -> {
+            if (routines == null) return;
             currentRoutine.setValue(routines.get(0));
         });
 
+
+        // Initialize task ordering for current routine
         currentRoutine.observe(routine -> {
             if (routine == null) return;
             var ordering = new ArrayList<Integer>();
-            for (int i = 0; i < routine.getTasks().size(); i++) {
-                ordering.add(routine.getTasks().get(i).id());
+            for (int i = 0; i < routine.tasks().size(); i++) {
+                ordering.add(routine.tasks().get(i).id());
             }
-            title.setValue(routine.getName());
-            goalTime.setValue(routine.getGoalTime());
             taskOrdering.setValue(ordering);
+        });
+
+        // Change title when current routine changes
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
+            title.setValue(routine.name());
+        });
+
+
+        // Update ordered tasks when the ordering changes
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
+            goalTime.setValue(routine.goalTime());
         });
 
         taskOrdering.observe(ordering -> {
@@ -134,6 +159,23 @@ public class MainViewModel extends ViewModel {
                 tasks.add(task);
             }
             orderedTasks.setValue(tasks);
+        });
+
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
+            List<ActiveTask> activeTasks = new ArrayList<>();
+            for (var task : routine.tasks()) {
+                ActiveTask newActiveTask = new ActiveTask(task, false);
+                activeTasks.add(newActiveTask);
+            }
+
+            activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
+        });
+
+        activeRoutine.observe(routine -> {
+            if (routine == null) return;
+            System.out.println(routine.routine().name());
+            System.out.println(routine.activeTasks().get(0).task().name());
         });
 
         currentTime.observe(time -> {
@@ -152,20 +194,27 @@ public class MainViewModel extends ViewModel {
         return orderedTasks;
     }
 
+    public MutableSubject<ActiveRoutine> getActiveRoutine() {
+        return activeRoutine;
+    }
+
     public void nextRoutine() {
-        if (routineOrdering.getValue() == null) return;
-        var newOrdering = RoutineList.rotateRoutine(routineOrdering.getValue(), 1);
-        isShowingMorning.setValue(!isShowingMorning.getValue());
+        if (this.routineOrdering.getValue() == null) {
+            return;
+        }
+        var newOrdering = RoutineList.rotateOrdering(routineOrdering.getValue(), 1);
+
         routineOrdering.setValue(newOrdering);
     }
 
-    private void updateTitle(boolean isShowingMorning) {
-        String routineTitle = isShowingMorning ? "Morning Routine" : "Evening Routine";
-        title.setValue(routineTitle);
-    }
-
-    public MutableSubject<Boolean> getIsShowingMorning() {
-        return this.isShowingMorning;
+    public void checkTask(Integer id) {
+        if (this.activeRoutine.getValue() == null) {
+            return;
+        }
+        var task = activeRoutine.getValue().activeTasks().stream().filter(activeTask -> Objects.equals(activeTask.task().id(), id)).findFirst();
+        if (task.isEmpty()) return;
+        var checkedTask = task.get().withChecked(true);
+        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
     }
 
     public MutableSubject<Integer> getGoalTime() {
@@ -223,12 +272,15 @@ public class MainViewModel extends ViewModel {
     }
 
     public void setRoutineGoalTime(int id, Integer time) {
-        routineRepository.setRoutineGoalTime(id, time);
-        goalTime.setValue(getRoutineGoalTime(id));
+        var routine = routineRepository.find(id).getValue();
+        if (routine == null) return;
+        var newRoutine = routine.withGoalTime(time);
+        routineRepository.save(newRoutine);
     }
 
     public int getRoutineGoalTime(int id) {
-        return routineRepository.getRoutineTime(id);
+        Routine routine = Objects.requireNonNull(routineRepository.find(id).getValue());
+        return routine.goalTime();
     }
 
     public void updateGoalTimeDisplay(int time) {
@@ -240,6 +292,10 @@ public class MainViewModel extends ViewModel {
 
     public MutableSubject<String> getGoalTimeDisplay() {
         return goalTimeDisplay;
+    }
+
+    public MutableSubject<Routine> getCurrentRoutine() {
+        return currentRoutine;
     }
 
     @Override

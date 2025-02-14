@@ -6,13 +6,11 @@ import androidx.annotation.Nullable;
 import java.util.Objects;
 
 public class Task {
-
     private final @Nullable Integer id;
-    private @NonNull String name;
-    // some sort of time field, not ready for this yet
-    // ... more fields to come
+    private final @NonNull String name;
+
     public Task(@Nullable Integer id, @NonNull String name) {
-        if (name == null ) {
+        if (name == null) {
             throw new IllegalArgumentException("Task Name must not be null");
         }
         if (name.isEmpty()) {
@@ -26,11 +24,22 @@ public class Task {
         return this.id;
     }
 
-    public String getName() {
+    public @NonNull String name() {
         return this.name;
     }
-    public void setName(String newName) {
-        this.name = newName;
+
+    public Task withId(@Nullable Integer id) {
+        return new Task(id, name());
+    }
+
+    public Task withName(@NonNull String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Task Name must not be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Task Name must not be empty");
+        }
+        return new Task(id(), name);
     }
 
     @Override
@@ -38,11 +47,11 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && Objects.equals(getName(), task.getName());
+        return Objects.equals(id, task.id) && Objects.equals(name, task.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, getName());
+        return Objects.hash(id, name);
     }
 }

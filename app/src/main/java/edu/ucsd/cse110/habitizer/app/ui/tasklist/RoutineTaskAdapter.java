@@ -10,18 +10,23 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-import edu.ucsd.cse110.habitizer.app.databinding.TaskBinding;
-import edu.ucsd.cse110.habitizer.lib.domain.Task;
+import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 
-public class TaskListAdapter extends ArrayAdapter<Task> {
-    public TaskListAdapter(Context context, List<Task> tasks) {
+public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
+
+    Consumer<Integer> onCheckedClick;
+
+    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
         // Also note that ArrayAdapter NEEDS a mutable List (ArrayList),
         // or it will crash!
-        super(context, 0, new ArrayList<>(tasks));
+        super(context, 0, new ArrayList<>(activeTasks));
+        this.onCheckedClick = onCheckedClick;
     }
 
     @NonNull
@@ -32,18 +37,28 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         assert task != null;
 
         // Check if a view is being reused...
-        TaskBinding binding;
+        RoutineTaskBinding binding;
         if (convertView != null) {
             // if so, bind to it
-            binding = TaskBinding.bind(convertView);
+            binding = RoutineTaskBinding.bind(convertView);
         } else {
             // otherwise inflate a new view from our layout XML.
             var layoutInflater = LayoutInflater.from(getContext());
-            binding = TaskBinding.inflate(layoutInflater, parent, false);
+            binding = RoutineTaskBinding.inflate(layoutInflater, parent, false);
         }
 
         // Populate the view with the task
-        binding.taskName.setText(task.name());
+        binding.checkTask.setText(task.task().name());
+        binding.checkTask.setChecked(task.checked());
+        if (task.checked()) {
+            binding.checkTask.setEnabled(false);
+        }
+        binding.checkTask.setOnClickListener(view -> {
+            var id = task.task().id();
+            assert id != null;
+            onCheckedClick.accept(id);
+
+        });
         return binding.getRoot();
     }
 
@@ -61,7 +76,7 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         var task = getItem(position);
         assert task != null;
 
-        var id = task.id();
+        var id = task.task().id();
         assert id != null;
 
         return id;

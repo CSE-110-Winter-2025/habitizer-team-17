@@ -3,51 +3,73 @@ package edu.ucsd.cse110.habitizer.lib.domain;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Routine {
-    private @NonNull List<Task> tasks;
-
-    private @NonNull String name;
     private final @Nullable Integer id;
+    private final @NonNull String name;
+    private final @NonNull List<Task> tasks;
+
     private @NonNull Integer goalTime;
 
     public Routine(@Nullable Integer id, @NonNull String name, @NonNull List<Task> tasks, @NonNull Integer goalTime) {
-        if (tasks == null) {
-            throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
-                    "are present");
-        }
-        if (name == null ) {
+        if (name == null) {
             throw new IllegalArgumentException("Routine Name must not be null");
         }
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Routine Name must not be empty");
         }
+        if (tasks == null) {
+            throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
+                    "are present");
+        }
+        this.id = id;
         this.name = name;
         this.tasks = tasks;
-        this.id = id;
         this.goalTime = goalTime;
     }
 
-    public Integer id() {
+    public @Nullable Integer id() {
         return this.id;
     }
-    public List<Task> getTasks() {
-        return this.tasks;
-    }
 
-    public String getName() {
+    public @NonNull String name() {
         return this.name;
     }
 
-    public void setGoalTime(@NonNull Integer time) {
-        this.goalTime = time;
+    public @NonNull List<Task> tasks() {
+        return this.tasks;
     }
 
-    public int getGoalTime() {
+    public @NonNull Integer goalTime() {
         return this.goalTime;
+    }
+
+    public Routine withId(@Nullable Integer id) {
+        return new Routine(id, name(), tasks(), goalTime());
+    }
+
+    public Routine withName(@NonNull String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Routine Name must not be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Routine Name must not be empty");
+        }
+        return new Routine(id(), name, tasks(), goalTime());
+    }
+
+    public Routine withTasks(@NonNull List<Task> tasks) {
+        if (tasks == null) {
+            throw new IllegalArgumentException("Tasks must not be null; pass empty list if no tasks " +
+                    "are present");
+        }
+        return new Routine(id(), name(), tasks, goalTime());
+    }
+
+    public Routine withGoalTime(@NonNull Integer goalTime) {
+        return new Routine(id(), name(), tasks(), goalTime);
     }
 
     @Override
@@ -55,11 +77,11 @@ public class Routine {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Routine routine = (Routine) o;
-        return Objects.equals(getTasks(), routine.getTasks()) && Objects.equals(getName(), routine.getName()) && Objects.equals(id, routine.id);
+        return Objects.equals(id, routine.id) && Objects.equals(name, routine.name) && Objects.equals(tasks, routine.tasks) && Objects.equals(goalTime, routine.goalTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTasks(), getName(), id);
+        return Objects.hash(id, name, tasks, goalTime);
     }
 }

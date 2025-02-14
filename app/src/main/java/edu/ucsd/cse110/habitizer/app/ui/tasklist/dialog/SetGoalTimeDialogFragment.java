@@ -54,7 +54,10 @@ public class SetGoalTimeDialogFragment extends DialogFragment {
 
     private void onPositiveButtonClick(DialogInterface dialog, int which) {
         var time = Integer.parseInt(view.goalTimeEditText.getText().toString());
-        int id = activityModel.getIsShowingMorning().getValue() ? 0 : 1;
+        var currentRoutine = activityModel.getCurrentRoutine().getValue();
+        if (currentRoutine == null) return;
+        Integer id = currentRoutine.id();
+        if (id == null) return;
         activityModel.setRoutineGoalTime(id, time);
 
         dialog.dismiss();

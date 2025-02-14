@@ -31,15 +31,4 @@ public class RoutineRepository {
         dataSource.putRoutine(routine);
     }
 
-    public void setRoutineGoalTime(int id, @NonNull Integer time) {
-        Routine routine = dataSource.getRoutineSubject(id).getValue();
-        routine.setGoalTime(time);
-
-    }
-
-    public int getRoutineTime(int id) {
-        Routine routine = dataSource.getRoutineSubject(id).getValue();
-        return routine.getGoalTime();
-    }
-
 }
