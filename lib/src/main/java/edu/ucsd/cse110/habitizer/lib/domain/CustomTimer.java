@@ -5,16 +5,15 @@ import java.util.TimerTask;
 
 public class CustomTimer {
     protected Timer timer;
-    protected long elapsedTime;
+    protected long elapsedTimeMilliSeconds;
     protected boolean isRunning;
-    protected final int Final_Seconds = 1000;
+    public static final int MILLISECONDS_PER_SECOND = 1000;
     protected TimerTask timerTask;
-    protected String completedTime;
+
 
     public CustomTimer() {
-        this.elapsedTime = 0;
+        this.elapsedTimeMilliSeconds = 0;
         this.isRunning = false;
-        this.completedTime = "00:00";
     }
 
     private void startTimer() {
@@ -26,10 +25,10 @@ public class CustomTimer {
         timerTask = new TimerTask() {
             @Override
             public void run() {
-                elapsedTime += Final_Seconds;
+                elapsedTimeMilliSeconds += MILLISECONDS_PER_SECOND;
             }
         };
-        timer.schedule(timerTask, 1000, 1000); // Schedule with a delay of 1s, then repeat every 1s
+        timer.schedule(timerTask, MILLISECONDS_PER_SECOND, MILLISECONDS_PER_SECOND); // Schedule with a delay of 1s, then repeat every 1s
     }
 
     public void start() {
@@ -37,6 +36,15 @@ public class CustomTimer {
             startTimer(); // Start from the current elapsed time
             isRunning = true;
         }
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+
+    public long getElapsedTimeInMilliSeconds(){
+        return elapsedTimeMilliSeconds;
     }
 
     public void stop() {
@@ -47,24 +55,7 @@ public class CustomTimer {
                 timer = null;
             }
             isRunning = false;
-            completedTime = getFormattedTime();
         }
-    }
-
-
-    public String getFormattedTime() {
-        long totalSeconds = elapsedTime / Final_Seconds;
-        long hours = totalSeconds / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
-
-        return (hours > 0)
-                ? String.format("%d:%02d", hours, minutes)
-                : String.format("%dm", minutes);
-    }
-
-    public boolean isRunning() {
-        return isRunning;
     }
 
     public void reset() {
@@ -73,8 +64,7 @@ public class CustomTimer {
             timer.purge();
             timer = null;
         }
-        elapsedTime = 0;
+        elapsedTimeMilliSeconds = 0;
         isRunning = false;
-        completedTime = "00:00";
     }
 }

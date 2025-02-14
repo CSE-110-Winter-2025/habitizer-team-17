@@ -5,7 +5,7 @@ public class MockTimer extends CustomTimer {
     private final int FORWARD_SECONDS = 30;
 
     public void forward() {
-        elapsedTime += (FORWARD_SECONDS * Final_Seconds);
-        // completedTime = getFormattedTime();
+        elapsedTimeMilliSeconds += (FORWARD_SECONDS * MILLISECONDS_PER_SECOND);
     }
+
 }

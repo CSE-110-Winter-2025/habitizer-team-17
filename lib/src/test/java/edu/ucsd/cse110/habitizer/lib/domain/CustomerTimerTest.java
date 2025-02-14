@@ -3,6 +3,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.net.MulticastSocket;
+
 public class CustomerTimerTest {
     private CustomTimer timer;
 
@@ -17,24 +20,23 @@ public class CustomerTimerTest {
         Thread.sleep(2000); // Wait for 2 seconds
         timer.stop();
 
-        String elapsed = timer.getFormattedTime(); // Store as a String
-        assertNotEquals("00:00", elapsed); // Timer should not be at "00:00"
+        long elapsedTime = timer.getElapsedTimeInMilliSeconds(); // Store as a String
+        assertNotEquals(0, elapsedTime/timer.MILLISECONDS_PER_SECOND); // Timer should not be at "00:00"
     }
 
 
     @Test
     public void testStopTimer() throws InterruptedException {
         timer.start();
-        Thread.sleep(2000); // Wait for 2 seconds
+        Thread.sleep(2002); // Wait for 2 seconds
         timer.stop();
-        String stoppedTime = timer.getFormattedTime();
 
         // Ensure time is stored correctly
-        assertNotEquals("0:00", stoppedTime);
+        assertNotEquals(0, timer.getElapsedTimeInMilliSeconds());
 
         // Ensure stopping the timer prevents further increments
         Thread.sleep(2000);
-        assertEquals(stoppedTime, timer.getFormattedTime());
+        assertEquals(2000, timer.getElapsedTimeInMilliSeconds());
     }
 
     @Test
@@ -45,7 +47,7 @@ public class CustomerTimerTest {
         t.forward();
 
         // Timer should advance by 30 seconds
-        assertEquals("1m", timer.getFormattedTime());
+        assertEquals(60*CustomTimer.MILLISECONDS_PER_SECOND, t.getElapsedTimeInMilliSeconds());
     }
 
 }

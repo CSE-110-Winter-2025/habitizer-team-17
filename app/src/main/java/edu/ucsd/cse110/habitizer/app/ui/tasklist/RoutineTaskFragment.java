@@ -74,8 +74,18 @@ public class RoutineTaskFragment extends Fragment {
             view.stopButton.setEnabled(isRunning);
         });
 
-        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
+        activityModel.getCurrentTimeDisplay().observe(o -> {
+            if(activityModel.getIsTimerRunning().getValue()) {
+                view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue());
+            }
+        });
 
+
+        activityModel.getCompletedTimeDisplay().observe(o -> {
+                if(!activityModel.getIsTimerRunning().getValue()) {
+                    view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
+                }
+        });
         // Button click listeners
 
         if(activityModel.isMocked()) {
