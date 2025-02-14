@@ -103,9 +103,10 @@ public class InMemoryDataSource {
     public final static List<Task> EVENING_TASKS = List.of(
             new Task(7, "Pack Balls")
     );
-    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine", MORNING_TASKS);
 
-    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine", EVENING_TASKS);
+    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS, 20);
+
+    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS, 10);
 
     public static InMemoryDataSource fromDefault() {
         var data = new InMemoryDataSource();

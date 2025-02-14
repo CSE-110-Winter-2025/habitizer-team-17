@@ -26,21 +26,24 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/task_list"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.051"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47" />
 
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Next"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageButton
+        android:id="@+id/fast_forward_button"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Fast Forward"
+        android:src="@android:drawable/ic_media_ff"
+        app:layout_constraintBottom_toTopOf="@+id/task_list"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.401"
-        app:layout_constraintStart_toEndOf="@+id/start_button"
-        app:layout_constraintTop_toBottomOf="@+id/task_list"
-        app:layout_constraintVertical_bias="0.342" />
+        app:layout_constraintHorizontal_bias="0.935"
+        app:layout_constraintStart_toEndOf="@+id/goal_time"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.533" />
 
     <Button
         android:id="@+id/start_button"
@@ -50,9 +53,75 @@
         android:text="Start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/next_button"
+        app:layout_constraintHorizontal_bias="0.548"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/task_list"
-        app:layout_constraintVertical_bias="0.342" />
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:text="Next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/stop_button"
+        app:layout_constraintTop_toBottomOf="@+id/task_list"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:text="Stop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/next_button"
+        app:layout_constraintHorizontal_bias="0.219"
+        app:layout_constraintStart_toEndOf="@+id/start_button"
+        app:layout_constraintTop_toBottomOf="@+id/task_list"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/goal_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="45m"
+        android:textSize="24dp"
+        app:layout_constraintBottom_toTopOf="@+id/task_list"
+        app:layout_constraintEnd_toStartOf="@+id/fast_forward_button"
+        app:layout_constraintStart_toEndOf="@+id/timer_display"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.47" />
+
+    <TextView
+        android:id="@+id/timer_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:text="00:00"
+        android:textSize="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/displayed_title"
+        app:layout_constraintEnd_toStartOf="@+id/goal_time"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/displayed_title"
+        app:layout_constraintTop_toTopOf="@+id/displayed_title"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/set_goal_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Set Time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/start_button"
+        app:layout_constraintTop_toBottomOf="@+id/task_list"
+        app:layout_constraintVertical_bias="0.0" />
 
     <!--    <EditText-->
 <!--        android:id="@+id/editTextText"-->

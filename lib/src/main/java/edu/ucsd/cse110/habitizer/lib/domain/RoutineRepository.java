@@ -1,5 +1,7 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
@@ -17,7 +19,6 @@ public class RoutineRepository {
     }
 
     public MutableSubject<Routine> find(int id) {
-
         return dataSource.getRoutineSubject(id);
     }
 
@@ -27,7 +28,6 @@ public class RoutineRepository {
     }
 
     public void save(Routine routine) {
-
         dataSource.putRoutine(routine);
     }
 

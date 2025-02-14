@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +21,9 @@ import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.R;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.SetGoalTimeDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
 public class TaskListFragment extends Fragment {
     private MainViewModel activityModel;
@@ -64,16 +67,33 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
-
         activityModel.getTitle().observe(title -> view.displayedTitle.setText(title));
+        activityModel.getGoalTimeDisplay().observe(goalTime -> view.goalTime.setText(goalTime));
+
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            view.startButton.setEnabled(!isRunning);
+            view.stopButton.setEnabled(isRunning);
+        });
+
+        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
+
+        // Button click listeners
+        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+
         view.nextButton.setOnClickListener(v -> {
             activityModel.nextRoutine();
         });
 
         view.startButton.setOnClickListener(v -> {
-
+            activityModel.startTimer();
             var app = (HabitizerApplication) requireActivity().getApplication();
             app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+        });
+
+        view.setGoalTime.setOnClickListener(v -> {
+            var dialogFragment = SetGoalTimeDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "SetGoalTimeDialogFragment");
         });
 
         return view.getRoot();
