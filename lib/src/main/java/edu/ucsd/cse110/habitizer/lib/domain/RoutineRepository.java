@@ -14,10 +14,6 @@ public class RoutineRepository {
         this.dataSource = dataSource;
     }
 
-    public Integer count() {
-        return dataSource.getRoutines().size();
-    }
-
     public MutableSubject<Routine> find(int id) {
         return dataSource.getRoutineSubject(id);
     }
@@ -30,5 +26,4 @@ public class RoutineRepository {
     public void save(Routine routine) {
         dataSource.putRoutine(routine);
     }
-
 }

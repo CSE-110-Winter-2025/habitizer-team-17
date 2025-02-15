@@ -12,46 +12,12 @@ import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
 
 public class InMemoryDataSource {
-
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, MutableSubject<Task>> taskSubjects = new HashMap<>();
-    private final MutableSubject<List<Task>> allTasksSubject = new PlainMutableSubject<>();
-
     private final Map<Integer, Routine> routines = new HashMap<>();
     private final Map<Integer, MutableSubject<Routine>> routineSubjects = new HashMap<>();
     private final MutableSubject<List<Routine>> allRoutinesSubject = new PlainMutableSubject<>();
 
     public InMemoryDataSource() {
 
-    }
-
-    public Task getTask(int id) {
-        return tasks.get(id);
-    }
-
-    public List<Task> getTasks() {
-        return List.copyOf(tasks.values());
-    }
-
-    public MutableSubject<Task> getTaskSubject(int id) {
-        if (!taskSubjects.containsKey(id)) {
-            var subject = new PlainMutableSubject<Task>();
-            subject.setValue(getTask(id));
-            taskSubjects.put(id, subject);
-        }
-        return taskSubjects.get(id);
-    }
-
-    public MutableSubject<List<Task>> getAllTasksSubject() {
-        return allTasksSubject;
-    }
-
-    public void putTask(Task task) {
-        tasks.put(task.id(), task);
-        if (taskSubjects.containsKey(task.id())) {
-            taskSubjects.get(task.id()).setValue(task);
-        }
-        allTasksSubject.setValue(getTasks());
     }
 
     public Routine getRoutine(int id) {
@@ -84,12 +50,6 @@ public class InMemoryDataSource {
         allRoutinesSubject.setValue(getRoutines());
     }
 
-    public void putTaskList(List<Task> tasks) {
-        for (var task : tasks) {
-            this.putTask(task);
-        }
-    }
-
     public final static List<Task> MORNING_TASKS = List.of(
             new Task(0, "Shower"),
             new Task(1, "Brush Teeth"),
@@ -99,21 +59,21 @@ public class InMemoryDataSource {
             new Task(5, "Dinner Prep"),
             new Task(6, "Pack Bag")
     );
-
     public final static List<Task> EVENING_TASKS = List.of(
             new Task(7, "Pack Balls")
     );
-
-    public final static Routine MORNING_ROUTINE = new Routine(0, "Morning Routine",  MORNING_TASKS, 20);
-
-    public final static Routine EVENING_ROUTINE = new Routine(1, "Evening Routine",  EVENING_TASKS, 10);
+    public final static Routine MORNING_ROUTINE = new Routine(
+            0, "Morning Routine", MORNING_TASKS, 20, 0
+    );
+    public final static Routine EVENING_ROUTINE = new Routine(
+            1, "Evening Routine", EVENING_TASKS, 10, 1
+    );
 
     public static InMemoryDataSource fromDefault() {
         var data = new InMemoryDataSource();
+
         data.putRoutine(MORNING_ROUTINE);
         data.putRoutine(EVENING_ROUTINE);
-        data.putTaskList(MORNING_TASKS);
-        data.putTaskList(EVENING_TASKS);
 
         return data;
     }
