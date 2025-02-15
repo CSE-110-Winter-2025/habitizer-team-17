@@ -8,6 +8,7 @@ public class ActiveTask {
     private final @NonNull Task task;
     private final boolean checked;
 
+
     public ActiveTask(@NonNull Task task, boolean checked) {
         this.task = task;
         this.checked = checked;
@@ -29,6 +30,7 @@ public class ActiveTask {
         return new ActiveTask(task(), checked);
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -41,4 +43,5 @@ public class ActiveTask {
     public int hashCode() {
         return Objects.hash(task, checked);
     }
+
 }
