@@ -72,6 +72,24 @@ public class RoutineTest {
     }
 
     @Test
+    public void testWithAppendedTask() {
+        var task = new Task(7, "Pack Balls");
+        List<Task> expectedTasks = List.of(
+                new Task(0, "Shower"),
+                new Task(1, "Brush Teeth"),
+                new Task(2, "Dress"),
+                new Task(3, "Make Coffee"),
+                new Task(4, "Make Lunch"),
+                new Task(5, "Dinner Prep"),
+                new Task(6, "Pack Bag"),
+                task
+        );
+        var expected = new Routine(0,"Morning", expectedTasks, 45, 1);
+        var actual = routine.withAppendedTask(task);
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void testEquals() {
         var routine1 = new Routine(0, "test", List.of(), 0, 0);
         var routine2 = new Routine(0, "test", List.of(), 0, 0);

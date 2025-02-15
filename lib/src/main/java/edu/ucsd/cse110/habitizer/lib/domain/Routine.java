@@ -3,6 +3,7 @@ package edu.ucsd.cse110.habitizer.lib.domain;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,6 +61,12 @@ public class Routine {
 
     public Routine withSortOrder(@NonNull Integer sortOrder) {
         return new Routine(id(), name(), tasks(), goalTime(), sortOrder);
+    }
+
+    public Routine withAppendedTask(Task task) {
+        var newTasks = new ArrayList<>(tasks);
+        newTasks.add(task);
+        return withTasks(newTasks);
     }
 
     @Override
