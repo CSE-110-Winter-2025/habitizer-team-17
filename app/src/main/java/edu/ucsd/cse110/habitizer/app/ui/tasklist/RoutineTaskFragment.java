@@ -12,13 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
-import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
-import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
@@ -47,10 +44,7 @@ public class RoutineTaskFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
-        this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
-            activityModel.checkTask(id);
-
-        });
+        this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> activityModel.checkTask(id));
         activityModel.getActiveRoutine().observe(routine -> {
             if (routine == null) return;
             adapter.clear();
@@ -61,20 +55,28 @@ public class RoutineTaskFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         view = RoutineScreenBinding.inflate(inflater, container, false);
         view.activeList.setAdapter(adapter);
+
         activityModel.getActiveRoutine().observe(activeRoutine -> {
             if (activeRoutine == null) return;
             view.routineTitle.setText(activeRoutine.routine().name());
         });
+
+        activityModel.getGoalTimeDisplay().observe(
+                goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
+        );
 
         activityModel.getIsTimerRunning().observe(isRunning -> {
             if (isRunning == null) return;
             view.stopButton.setEnabled(isRunning);
         });
 
-        activityModel.getCurrentTimeDisplay().observe(o -> view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue()));
+        activityModel.getCurrentTimeDisplay().observe(
+                currentTimeDisplay -> view.timerDisplay.setText(currentTimeDisplay)
+        );
 
         // Button click listeners
         view.stopButton.setOnClickListener(v -> activityModel.stopTimer());

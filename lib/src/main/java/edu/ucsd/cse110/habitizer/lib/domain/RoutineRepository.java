@@ -1,7 +1,5 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
 
-import androidx.annotation.NonNull;
-
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;

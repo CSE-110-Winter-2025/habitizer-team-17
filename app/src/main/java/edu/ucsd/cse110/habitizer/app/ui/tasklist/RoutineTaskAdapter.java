@@ -17,7 +17,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
-    Consumer<Integer> onCheckedClick;
+    private final Consumer<Integer> onCheckedClick;
 
     public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick) {
         // This sets a bunch of stuff internally, which we can access
