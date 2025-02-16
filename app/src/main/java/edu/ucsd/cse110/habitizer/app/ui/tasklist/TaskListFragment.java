@@ -22,6 +22,8 @@ import edu.ucsd.cse110.habitizer.app.R;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
 import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.SetGoalTimeDialogFragment;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
@@ -76,6 +78,15 @@ public class TaskListFragment extends Fragment {
 
         view.startButton.setOnClickListener(v -> {
             activityModel.startTimer();
+            List<ActiveTask> activeTasks = new ArrayList<>();
+            var routine = activityModel.getCurrentRoutine().getValue();
+            if (routine == null) return;
+            for (var task : routine.tasks()) {
+                ActiveTask newActiveTask = new ActiveTask(task, false);
+                activeTasks.add(newActiveTask);
+            }
+
+            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks));
             var app = (HabitizerApplication) requireActivity().getApplication();
             app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
         });

@@ -14,12 +14,15 @@ import java.util.function.Consumer;
 
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+import edu.ucsd.cse110.observables.MutableSubject;
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
     Consumer<Integer> onCheckedClick;
 
-    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick) {
+    MutableSubject<Boolean> onFinishedRoutine;
+
+    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<Boolean> onFinishedRoutine) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
@@ -27,6 +30,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // or it will crash!
         super(context, 0, new ArrayList<>(activeTasks));
         this.onCheckedClick = onCheckedClick;
+        this.onFinishedRoutine = onFinishedRoutine;
     }
 
     @NonNull
@@ -46,13 +50,23 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
             var layoutInflater = LayoutInflater.from(getContext());
             binding = RoutineTaskBinding.inflate(layoutInflater, parent, false);
         }
-
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
-        if (task.checked()) {
+
+        onFinishedRoutine.observe(finished -> {
+            if(finished == null) return;
+            if(finished) {
+                binding.checkTask.setEnabled(false);
+            }
+        });
+
+
+        if(task.checked()){
             binding.checkTask.setEnabled(false);
         }
+
+
         binding.checkTask.setOnClickListener(view -> {
             var id = task.task().id();
             assert id != null;

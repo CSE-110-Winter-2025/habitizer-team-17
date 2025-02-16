@@ -48,6 +48,10 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
 
+    private final MutableSubject<Boolean> onFinishedRoutine;
+
+
+
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
     // TODO: CITE
@@ -92,6 +96,7 @@ public class MainViewModel extends ViewModel {
         this.isTimerRunning = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
         this.currentTimeDisplay = new PlainMutableSubject<>();
+        this.onFinishedRoutine = new PlainMutableSubject<>(false);
         if(!isMocked) {
             this.timer = new CustomTimer();
         } else {
@@ -169,13 +174,6 @@ public class MainViewModel extends ViewModel {
 
         currentRoutine.observe(routine -> {
             if (routine == null) return;
-            List<ActiveTask> activeTasks = new ArrayList<>();
-            for (var task : routine.tasks()) {
-                ActiveTask newActiveTask = new ActiveTask(task, false);
-                activeTasks.add(newActiveTask);
-            }
-
-            activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
         });
 
         activeRoutine.observe(routine -> {
@@ -221,6 +219,15 @@ public class MainViewModel extends ViewModel {
         if (task.isEmpty()) return;
         var checkedTask = task.get().withChecked(true);
         activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
+    }
+
+    public boolean checkIfAllCompleted(){
+        boolean result = true;
+        for(var task: activeRoutine.getValue().activeTasks()){
+            if(!task.checked())
+                result = false;
+        }
+        return result;
     }
 
     public MutableSubject<Integer> getGoalTime() {
@@ -292,7 +299,7 @@ public class MainViewModel extends ViewModel {
 
     public void updateGoalTimeDisplay(int time) {
         String newGoalTimeDisplay = time + "m";
-        goalTimeDisplay.setValue(newGoalTimeDisplay + " ");
+        goalTimeDisplay.setValue(newGoalTimeDisplay);
         goalTimeDisplay.setValue(newGoalTimeDisplay);
     }
 
@@ -324,7 +331,23 @@ public class MainViewModel extends ViewModel {
         long minutes = (totalSeconds % 3600) / 60;
 
         return (hours > 0)
-                ? String.format("%d:%02d", hours, minutes)
-                : String.format("%dm", minutes);
+                ? String.format("%dh:%02d/", hours, minutes)
+                : String.format("%dm/", minutes);
+    }
+
+
+    public void endRoutine(){
+
+        stopTimer();
+        onFinishedRoutine.setValue(true);
+    }
+
+    public MutableSubject<Boolean> getOnFinishedRoutine(){
+        return onFinishedRoutine;
+    }
+
+    public void resetRoutine(){
+        onFinishedRoutine.setValue(false);
+
     }
 }
