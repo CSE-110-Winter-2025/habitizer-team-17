@@ -10,12 +10,17 @@ import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.TaskBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
+
 public class TaskListAdapter extends ArrayAdapter<Task> {
-    public TaskListAdapter(Context context, List<Task> tasks) {
+
+    public TaskListAdapter(Context context, List<Task> tasks, MainViewModel viewModel) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
@@ -30,19 +35,14 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         // Get the task for this position
         var task = getItem(position);
         assert task != null;
-
-        // Check if a view is being reused...
         TaskBinding binding;
         if (convertView != null) {
-            // if so, bind to it
             binding = TaskBinding.bind(convertView);
         } else {
-            // otherwise inflate a new view from our layout XML.
             var layoutInflater = LayoutInflater.from(getContext());
             binding = TaskBinding.inflate(layoutInflater, parent, false);
         }
 
-        // Populate the view with the task
         binding.taskName.setText(task.name());
         return binding.getRoot();
     }

@@ -54,7 +54,7 @@ public class TaskListFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
-        this.adapter = new TaskListAdapter(requireContext(), List.of());
+        this.adapter = new TaskListAdapter(requireContext(), List.of(), activityModel);
 
         activityModel.getOrderedTasks().observe(tasks -> {
             if (tasks == null) return;
@@ -82,7 +82,7 @@ public class TaskListFragment extends Fragment {
             var routine = activityModel.getCurrentRoutine().getValue();
             if (routine == null) return;
             for (var task : routine.tasks()) {
-                ActiveTask newActiveTask = new ActiveTask(task, false);
+                ActiveTask newActiveTask = new ActiveTask(task, false, 0);
                 activeTasks.add(newActiveTask);
             }
 

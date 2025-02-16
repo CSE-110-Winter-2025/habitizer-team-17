@@ -15,12 +15,15 @@ import java.util.function.Consumer;
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.observables.MutableSubject;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
+
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
     Consumer<Integer> onCheckedClick;
 
     MutableSubject<Boolean> onFinishedRoutine;
+    private long previousTaskEndTime = 0;
 
     public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<Boolean> onFinishedRoutine) {
         // This sets a bunch of stuff internally, which we can access
@@ -53,6 +56,29 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
+
+        if (task.checked()) {
+            // Calculate time since the *previous* task ended
+            long timeSincePrevious = task.checkedElapsedTime() - previousTaskEndTime;
+
+            // Round up to the next minute
+            long minutes = (timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND / 60);
+            if ((timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND) % 60 != 0) { // Check for any remaining seconds
+                minutes++;
+            }
+
+            binding.timeText.setText(String.format("%dm", minutes));
+
+            //Update previous task end time
+            previousTaskEndTime = task.checkedElapsedTime();
+
+        } else {
+            binding.timeText.setText("");
+            //Reset previous task end time if task is unchecked.
+            if(task.checkedElapsedTime() == 0){
+                previousTaskEndTime = 0;
+            }
+        }
 
         onFinishedRoutine.observe(finished -> {
             if(finished == null) return;

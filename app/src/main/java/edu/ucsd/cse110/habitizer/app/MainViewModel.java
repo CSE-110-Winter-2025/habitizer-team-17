@@ -215,9 +215,14 @@ public class MainViewModel extends ViewModel {
         if (this.activeRoutine.getValue() == null) {
             return;
         }
-        var task = activeRoutine.getValue().activeTasks().stream().filter(activeTask -> Objects.equals(activeTask.task().id(), id)).findFirst();
+        var task = activeRoutine.getValue().activeTasks().stream()
+                .filter(activeTask -> Objects.equals(activeTask.task().id(), id))
+                .findFirst();
         if (task.isEmpty()) return;
-        var checkedTask = task.get().withChecked(true);
+
+        // Get current elapsed time from timer
+        long currentElapsedTime = timer.getElapsedTimeInMilliSeconds();
+        var checkedTask = task.get().withChecked(true, currentElapsedTime);
         activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
     }
 
