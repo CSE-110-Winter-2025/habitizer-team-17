@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Objects;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.TaskBinding;
+import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.EditTaskDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
@@ -44,7 +46,19 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         }
 
         binding.taskName.setText(task.name());
+        binding.taskName.setOnClickListener(v -> {
+            var id = task.id();
+            assert id != null;
+            showRenameDialog(id, task.name());
+        });
+
+
         return binding.getRoot();
+    }
+
+    private void showRenameDialog(int taskId, String currentName) {
+        var dialog = EditTaskDialogFragment.newInstance(taskId, currentName);
+        dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "EditTaskDialog");
     }
 
     // The below methods aren't strictly necessary, usually.

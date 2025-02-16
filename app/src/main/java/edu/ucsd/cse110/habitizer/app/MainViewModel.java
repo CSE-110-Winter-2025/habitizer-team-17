@@ -359,4 +359,8 @@ public class MainViewModel extends ViewModel {
         onFinishedRoutine.setValue(false);
 
     }
+
+    public void renameTask(int taskId, String newName) {
+        taskRepository.rename(taskId, newName);
+    }
 }

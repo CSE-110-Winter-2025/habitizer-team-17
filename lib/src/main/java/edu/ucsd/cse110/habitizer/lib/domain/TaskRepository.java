@@ -31,4 +31,11 @@ public class TaskRepository {
 
         dataSource.putTask(task);
     }
+
+    public void rename(int id, String newName) {
+        MutableSubject<Task> taskSubject = find(id);
+        Task currentTask = taskSubject.getValue();
+        Task updatedTask = currentTask.withName(newName);
+        save(updatedTask);
+    }
 }
