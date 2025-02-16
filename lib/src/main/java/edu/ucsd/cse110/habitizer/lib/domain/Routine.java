@@ -85,4 +85,16 @@ public class Routine {
     public int hashCode() {
         return Objects.hash(id, name, tasks, goalTime, sortOrder);
     }
+
+    public Routine withRenamedTask(int taskId, String newName) {
+        var newTasks = new ArrayList<>(tasks);
+        for (int i = 0; i < newTasks.size(); i++) {
+            Task task = newTasks.get(i);
+            if (task.id() != null && task.id() == taskId) {
+                newTasks.set(i, task.withName(newName));
+                break;
+            }
+        }
+        return withTasks(newTasks);
+    }
 }

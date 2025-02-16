@@ -75,11 +75,11 @@ public class TaskListFragment extends Fragment {
             var routine = activityModel.getCurrentRoutine().getValue();
             if (routine == null) return;
             for (var task : routine.tasks()) {
-                ActiveTask newActiveTask = new ActiveTask(task, false);
+                ActiveTask newActiveTask = new ActiveTask(task, false, 0);
                 activeTasks.add(newActiveTask);
             }
 
-            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks));
+            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks,0L));
 
             activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
 

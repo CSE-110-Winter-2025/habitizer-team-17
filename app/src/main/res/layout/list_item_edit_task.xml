@@ -11,6 +11,8 @@
         android:layout_marginStart="48dp"
         android:text="@string/task_name"
         android:textSize="20sp"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

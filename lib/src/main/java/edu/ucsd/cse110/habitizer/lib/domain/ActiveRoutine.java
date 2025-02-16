@@ -11,9 +11,12 @@ public class ActiveRoutine {
     private final @NonNull Routine routine;
     private final @NonNull List<ActiveTask> activeTasks;
 
-    public ActiveRoutine(@NonNull Routine routine, @NonNull List<ActiveTask> activeTasks) {
+    private final @NonNull Long  previousTaskEndTime;
+
+    public ActiveRoutine(@NonNull Routine routine, @NonNull List<ActiveTask> activeTasks, @NonNull Long previousTaskEndTime) {
         this.routine = routine;
         this.activeTasks = activeTasks;
+        this.previousTaskEndTime = previousTaskEndTime;
     }
 
     public @NonNull Routine routine() {
@@ -33,7 +36,15 @@ public class ActiveRoutine {
                 newActiveTasks.add(oldactiveTask);
             }
         }
-        return new ActiveRoutine(routine(), newActiveTasks);
+        return new ActiveRoutine(routine(), newActiveTasks, this.previousTaskEndTime);
+    }
+
+    public ActiveRoutine withPreviousTaskEndTime(@NonNull Long previousTaskEndTime) {
+        return new ActiveRoutine(routine(), activeTasks, previousTaskEndTime);
+    }
+
+    public long previousTaskEndTime() {
+        return previousTaskEndTime;
     }
 
     @Override

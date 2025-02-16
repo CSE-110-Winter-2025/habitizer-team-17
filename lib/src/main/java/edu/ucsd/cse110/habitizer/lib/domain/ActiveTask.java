@@ -7,11 +7,12 @@ import java.util.Objects;
 public class ActiveTask {
     private final @NonNull Task task;
     private final boolean checked;
+    private final long checkedElapsedTime;
 
-
-    public ActiveTask(@NonNull Task task, boolean checked) {
+    public ActiveTask(@NonNull Task task, boolean checked, long checkedElapsedTime) {
         this.task = task;
         this.checked = checked;
+        this.checkedElapsedTime = checkedElapsedTime;
     }
 
     public @NonNull Task task() {
@@ -21,13 +22,16 @@ public class ActiveTask {
     public boolean checked() {
         return this.checked;
     }
-
-    public ActiveTask withTask(@NonNull Task task) {
-        return new ActiveTask(task, checked());
+    public long checkedElapsedTime() {
+        return checkedElapsedTime;
     }
 
-    public ActiveTask withChecked(boolean checked) {
-        return new ActiveTask(task(), checked);
+    public ActiveTask withTask(@NonNull Task task) {
+        return new ActiveTask(task, checked(), checkedElapsedTime);
+    }
+
+    public ActiveTask withChecked(boolean checked, long currentElapsedTime) {
+        return new ActiveTask(task(), checked, checked ? currentElapsedTime : 0);
     }
 
 

@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.observables.MutableSubject;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
+
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
@@ -40,7 +42,6 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         var task = getItem(position);
         assert task != null;
 
-        // Check if a view is being reused...
         RoutineTaskBinding binding;
         if (convertView != null) {
             // if so, bind to it
@@ -53,6 +54,20 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
+
+        if (task.checked()) {
+
+
+            long seconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
+            long minutes = (seconds + 59)/ 60;
+
+            minutes = Math.max(1, minutes);
+
+            binding.timeText.setText(String.format("%dm", minutes));
+
+        } else {
+            binding.timeText.setText("-");
+        }
 
         onFinishedRoutine.observe(finished -> {
             if(finished == null) return;

@@ -198,8 +198,12 @@ public class MainViewModel extends ViewModel {
                 .filter(activeTask -> Objects.equals(activeTask.task().id(), id))
                 .findFirst();
         if (task.isEmpty()) return;
-        var checkedTask = task.get().withChecked(true);
-        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
+
+        // Get current elapsed time from timer
+        long currentTime = timer.getElapsedTimeInMilliSeconds();
+        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
+        var checkedTask = task.get().withChecked(true, currentElapsedTime);
+        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask).withPreviousTaskEndTime(currentTime));
     }
 
     public boolean checkIfAllCompleted(){
@@ -323,5 +327,14 @@ public class MainViewModel extends ViewModel {
     public void resetRoutine(){
         onFinishedRoutine.setValue(false);
 
+    }
+
+    public void renameTask(int taskId, String newName) {
+        if (currentRoutine.getValue() == null) return;
+        if (newName.isBlank()) return;
+
+        var routine = currentRoutine.getValue();
+        var updatedRoutine = routine.withRenamedTask(taskId, newName);
+        routineRepository.save(updatedRoutine);
     }
 }
