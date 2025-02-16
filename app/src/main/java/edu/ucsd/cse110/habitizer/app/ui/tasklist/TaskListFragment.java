@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
@@ -69,14 +68,12 @@ public class TaskListFragment extends Fragment {
 
         view.startButton.setOnClickListener(v -> {
             activityModel.startTimer();
-            var app = (HabitizerApplication) requireActivity().getApplication();
-            app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+            activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
         });
 
-        view.editButton.setOnClickListener(v -> {
-            var app = (HabitizerApplication) requireActivity().getApplication();
-            app.getScreen().setValue(Screen.EDIT_ROUTINE_SCREEN);
-        });
+        view.editButton.setOnClickListener(
+                v -> activityModel.getScreen().setValue(Screen.EDIT_ROUTINE_SCREEN)
+        );
 
         return view.getRoot();
     }

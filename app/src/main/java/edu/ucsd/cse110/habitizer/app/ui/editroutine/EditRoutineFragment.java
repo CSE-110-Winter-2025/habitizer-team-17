@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentEditRoutineBinding;
@@ -76,10 +75,9 @@ public class EditRoutineFragment extends Fragment {
             dialogFragment.show(getParentFragmentManager(), "AddTaskDialogFragment");
         });
 
-        view.routineEndEditButton.setOnClickListener(v -> {
-            var app = (HabitizerApplication) requireActivity().getApplication();
-            app.getScreen().setValue(Screen.PREVIEW_SCREEN);
-        });
+        view.routineEndEditButton.setOnClickListener(
+                v -> activityModel.getScreen().setValue(Screen.PREVIEW_SCREEN)
+        );
 
         return view.getRoot();
     }

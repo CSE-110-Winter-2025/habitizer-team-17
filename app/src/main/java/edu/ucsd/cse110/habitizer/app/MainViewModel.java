@@ -4,7 +4,6 @@ import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLI
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
@@ -28,6 +27,7 @@ public class MainViewModel extends ViewModel {
     private final RoutineRepository routineRepository;
 
     // UI state
+    private final MutableSubject<Screen> screen;
     private final MutableSubject<List<Routine>> orderedRoutines;
     private final MutableSubject<Routine> currentRoutine;
     private final MutableSubject<String> title;
@@ -70,6 +70,8 @@ public class MainViewModel extends ViewModel {
     public MainViewModel(RoutineRepository routineRepository) {
         this.routineRepository = routineRepository;
         // Initialize observables
+        this.screen = new PlainMutableSubject<>(Screen.PREVIEW_SCREEN);
+
         this.orderedRoutines = new PlainMutableSubject<>();
         this.orderedTasks = new PlainMutableSubject<>();
         this.currentRoutine = new PlainMutableSubject<>();
@@ -160,6 +162,10 @@ public class MainViewModel extends ViewModel {
             var display = time + "m";
             goalTimeDisplay.setValue(display);
         });
+    }
+
+    public MutableSubject<Screen> getScreen() {
+        return screen;
     }
 
     public MutableSubject<List<Task>> getOrderedTasks() {

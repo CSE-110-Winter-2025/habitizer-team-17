@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.habitizer.app.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.habitizer.app.ui.editroutine.EditRoutineFragment;
@@ -14,15 +14,19 @@ import edu.ucsd.cse110.habitizer.app.ui.tasklist.TaskListFragment;
 
 
 public class MainActivity extends AppCompatActivity {
+    private MainViewModel activityModel;
     private ActivityMainBinding view;
-
-    private MutableLiveData<Screen> screen;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle(R.string.app_name);
+
+        // Initialize the Model
+        var modelOwner = this;
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
 
         this.view = ActivityMainBinding.inflate(getLayoutInflater());
         setUpObservers();
@@ -31,9 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setUpObservers() {
-        var app = (HabitizerApplication) getApplication();
-        screen = app.getScreen();
-        screen.observeForever(screen -> {
+        activityModel.getScreen().observe(screen -> {
             if (screen == null) return;
             swapFragments(screen);
         });
