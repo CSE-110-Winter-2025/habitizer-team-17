@@ -231,6 +231,18 @@ public class MainViewModel extends ViewModel {
         routineOrdering.setValue(newOrdering);
     }
 
+    private void refreshCurrentRoutine() {
+        Routine routine = currentRoutine.getValue();
+        if (routine == null) return;
+        List<Task> updatedTasks = new ArrayList<>();
+        for (Task task : routine.tasks()) {
+            Task updatedTask = taskRepository.find(task.id()).getValue();
+            updatedTasks.add(updatedTask);
+        }
+        // Update the currentRoutine with the refreshed tasks
+        currentRoutine.setValue(routine.withTasks(updatedTasks));
+    }
+
     public void checkTask(Integer id) {
         if (this.activeRoutine.getValue() == null) {
             return;
@@ -264,6 +276,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void startTimer() {
+        refreshCurrentRoutine();
         timer.reset();
         timer.start();
         isTimerRunning.setValue(true);
