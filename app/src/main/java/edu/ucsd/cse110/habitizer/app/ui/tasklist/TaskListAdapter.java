@@ -22,7 +22,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class TaskListAdapter extends ArrayAdapter<Task> {
 
-    public TaskListAdapter(Context context, List<Task> tasks, MainViewModel viewModel) {
+    public TaskListAdapter(Context context, List<Task> tasks) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
