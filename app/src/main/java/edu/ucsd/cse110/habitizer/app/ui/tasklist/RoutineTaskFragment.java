@@ -12,30 +12,18 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
-
-import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 
 import edu.ucsd.cse110.habitizer.app.Screen;
-import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
-import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
-import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
-import edu.ucsd.cse110.habitizer.lib.domain.Task;
-import edu.ucsd.cse110.observables.MutableSubject;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
     private RoutineScreenBinding view;
     private RoutineTaskAdapter adapter;
-
-
-
 
     public RoutineTaskFragment() {
         // Required empty constructor
