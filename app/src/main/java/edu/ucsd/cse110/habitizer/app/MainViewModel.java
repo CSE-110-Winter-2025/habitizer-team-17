@@ -24,8 +24,6 @@ import edu.ucsd.cse110.observables.PlainMutableSubject;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
 public class MainViewModel extends ViewModel {
-    private static final String LOG_TAG = "MainViewModel";
-
     // Domain state
     private final RoutineRepository routineRepository;
 
@@ -151,12 +149,6 @@ public class MainViewModel extends ViewModel {
             activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
         });
 
-        activeRoutine.observe(routine -> {
-            if (routine == null) return;
-            System.out.println(routine.routine().name());
-            System.out.println(routine.activeTasks().get(0).task().name());
-        });
-
         currentTime.observe(time -> {
             if (time == null) return;
             updateCurrentTimeDisplay(currentTime.getValue());
@@ -230,7 +222,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public MutableSubject<String> getTitle() {
-        Log.d("MainViewModel", "This is from getTitle");
         return title;
     }
 
@@ -263,6 +254,13 @@ public class MainViewModel extends ViewModel {
 
     public MutableSubject<Routine> getCurrentRoutine() {
         return currentRoutine;
+    }
+
+    public void appendTaskToCurrentRoutine(Task task) {
+        if (currentRoutine.getValue() == null) return;
+        var newRoutine = currentRoutine.getValue().withAppendedTask(task);
+        System.out.println(newRoutine.tasks().get(newRoutine.tasks().size()-1));
+        routineRepository.save(newRoutine);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package edu.ucsd.cse110.habitizer.lib.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
 
 public class InMemoryDataSource {
+    private int nextId = 0;
     private final Map<Integer, Routine> routines = new HashMap<>();
     private final Map<Integer, MutableSubject<Routine>> routineSubjects = new HashMap<>();
     private final MutableSubject<List<Routine>> allRoutinesSubject = new PlainMutableSubject<>();
@@ -41,11 +43,32 @@ public class InMemoryDataSource {
 
 
     public void putRoutine(Routine routine) {
+        routine = preInsert(routine);
         routines.put(routine.id(), routine);
         if (routineSubjects.containsKey(routine.id())) {
             routineSubjects.get(routine.id()).setValue(routine);
         }
         allRoutinesSubject.setValue(getRoutines());
+    }
+
+    // assign ids to newly created tasks that don't have ids yet
+    // temporary solution until we can persist data
+    private Routine preInsert(Routine routine) {
+        var newTasks = new ArrayList<Task>();
+        for (var task : routine.tasks()) {
+            var id = task.id();
+            if (id == null) {
+                newTasks.add(task.withId(getNextAvailableId()));
+            } else {
+                newTasks.add(task);
+            }
+        }
+        return routine.withTasks(newTasks);
+    }
+
+    private int getNextAvailableId() {
+        while (routines.containsKey(nextId)) nextId++;
+        return nextId;
     }
 
     public final static List<Task> MORNING_TASKS = List.of(

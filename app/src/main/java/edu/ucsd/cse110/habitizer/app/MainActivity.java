@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
 import edu.ucsd.cse110.habitizer.app.databinding.ActivityMainBinding;
+import edu.ucsd.cse110.habitizer.app.ui.editroutine.EditRoutineFragment;
 import edu.ucsd.cse110.habitizer.app.ui.tasklist.RoutineTaskFragment;
 import edu.ucsd.cse110.habitizer.app.ui.tasklist.TaskListFragment;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = switch (screen) {
             case PREVIEW_SCREEN -> TaskListFragment.newInstance();
             case ACTIVE_ROUTINE_SCREEN -> RoutineTaskFragment.newInstance();
+            case EDIT_ROUTINE_SCREEN -> EditRoutineFragment.newInstance();
         };
 
         getSupportFragmentManager()

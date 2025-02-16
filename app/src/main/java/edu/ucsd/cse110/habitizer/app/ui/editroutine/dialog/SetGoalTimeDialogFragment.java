@@ -1,4 +1,4 @@
-package edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog;
+package edu.ucsd.cse110.habitizer.app.ui.editroutine.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
