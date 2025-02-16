@@ -174,6 +174,26 @@ public class MainViewModel extends ViewModel {
 
         currentRoutine.observe(routine -> {
             if (routine == null) return;
+            // Observe all tasks in the routine for changes
+            for (Task task : routine.tasks()) {
+                taskRepository.find(task.id()).observe(updatedTask -> {
+                    if (updatedTask == null) return;
+                    // Refresh the ordered tasks list when any task changes
+                    if (taskOrdering.getValue() != null) {
+                        var tasks = new ArrayList<Task>();
+                        for (var id : taskOrdering.getValue()) {
+                            var t = taskRepository.find(id).getValue();
+                            if (t == null) return;
+                            tasks.add(t);
+                        }
+                        orderedTasks.setValue(tasks);
+                    }
+                });
+            }
+        });
+
+        currentRoutine.observe(routine -> {
+            if (routine == null) return;
         });
 
         activeRoutine.observe(routine -> {
