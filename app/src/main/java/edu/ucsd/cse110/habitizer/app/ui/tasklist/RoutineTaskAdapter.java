@@ -43,7 +43,6 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         var task = getItem(position);
         assert task != null;
 
-        // Check if a view is being reused...
         RoutineTaskBinding binding;
         if (convertView != null) {
             // if so, bind to it
@@ -58,24 +57,23 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         binding.checkTask.setChecked(task.checked());
 
         if (task.checked()) {
-            // Calculate time since the *previous* task ended
             long timeSincePrevious = task.checkedElapsedTime() - previousTaskEndTime;
 
-            // Round up to the next minute
-            long minutes = (timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND / 60);
-            if ((timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND) % 60 != 0) { // Check for any remaining seconds
+            long seconds = timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND;
+            long minutes = seconds / 60;
+            if (seconds % 60 != 0) { // If there are any remaining seconds, round up
                 minutes++;
             }
 
-            binding.timeText.setText(String.format("%dm", minutes));
+            minutes = Math.max(1, minutes);
 
-            //Update previous task end time
+            binding.timeText.setText(String.format("%dm", minutes));
             previousTaskEndTime = task.checkedElapsedTime();
 
         } else {
             binding.timeText.setText("");
-            //Reset previous task end time if task is unchecked.
-            if(task.checkedElapsedTime() == 0){
+            // Reset previous task end time if task is unchecked
+            if (task.checkedElapsedTime() == 0) {
                 previousTaskEndTime = 0;
             }
         }
