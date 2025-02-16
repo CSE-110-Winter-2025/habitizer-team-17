@@ -12,25 +12,18 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
-import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
-import edu.ucsd.cse110.habitizer.app.Screen;
-import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
-import edu.ucsd.cse110.habitizer.lib.domain.Task;
-import edu.ucsd.cse110.observables.MutableSubject;
+
+import edu.ucsd.cse110.habitizer.app.Screen;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
     private RoutineScreenBinding view;
     private RoutineTaskAdapter adapter;
-
-
-
 
     public RoutineTaskFragment() {
         // Required empty constructor
@@ -54,12 +47,14 @@ public class RoutineTaskFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
+
         this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
             activityModel.checkTask(id);
             if(activityModel.checkIfAllCompleted()){
                 activityModel.endRoutine();
             }
         }, activityModel.getOnFinishedRoutine());
+
         activityModel.getActiveRoutine().observe(routine -> {
             if (routine == null) return;
             adapter.clear();
@@ -70,12 +65,23 @@ public class RoutineTaskFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         view = RoutineScreenBinding.inflate(inflater, container, false);
         view.activeList.setAdapter(adapter);
+
         activityModel.getActiveRoutine().observe(activeRoutine -> {
             if (activeRoutine == null) return;
             view.routineTitle.setText(activeRoutine.routine().name());
+        });
+
+        activityModel.getGoalTimeDisplay().observe(
+                goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
+        );
+
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            if (isRunning == null) return;
+            view.stopButton.setEnabled(isRunning);
         });
 
         activityModel.getOnFinishedRoutine().observe(finished -> {
@@ -89,8 +95,7 @@ public class RoutineTaskFragment extends Fragment {
 
         view.backButton.setVisibility(View.GONE);
         view.backButton.setOnClickListener(v -> {
-            var app = (HabitizerApplication) requireActivity().getApplication();
-            app.getScreen().setValue(Screen.PREVIEW_SCREEN);
+            activityModel.getScreen().setValue(Screen.PREVIEW_SCREEN);
             activityModel.resetRoutine();
         });
 

@@ -18,7 +18,7 @@ import edu.ucsd.cse110.observables.MutableSubject;
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
-    Consumer<Integer> onCheckedClick;
+    private final Consumer<Integer> onCheckedClick;
 
     MutableSubject<Boolean> onFinishedRoutine;
 

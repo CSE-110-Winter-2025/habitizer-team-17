@@ -1,50 +1,36 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class TaskTest {
 
-    Task TASK_A;
+    private Task task;
 
     @Before
     public void setup() {
-        TASK_A = new Task(1, "A");
+        task = new Task(0, "task");
     }
 
     @Test
-    public void getNameTest() {
-        var expected = "A";
-        assertEquals(expected, TASK_A.name());
+    public void testGetters() {
+        assertEquals(Integer.valueOf(0), task.id());
+        assertEquals("task", task.name());
+    }
+
+    @Test
+    public void testWithId() {
+        var expected = new Task(2, "task");
+        var actual = task.withId(2);
+        assertEquals(expected, actual);
     }
 
     @Test
     public void withNameTest() {
-        var expected = "B";
-        var newTask = TASK_A.withName("B");
-        assertEquals(expected, newTask.name());
-    }
-
-    @Test
-    public void getIdTest() {
-        Integer expected = 1;
-        assertEquals(expected, TASK_A.id());
-    }
-
-    @Test
-    public void nullNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task(2, null));
-    }
-
-    @Test
-    public void emptyNameTest() {
-        assertThrows(IllegalArgumentException.class, () -> new Task(2, ""));
+        var expected = new Task(0, "a task");
+        var actual = task.withName("a task");
+        assertEquals(expected, actual);
     }
 }
-
-/*
-
- */

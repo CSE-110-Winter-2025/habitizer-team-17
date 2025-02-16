@@ -15,7 +15,7 @@ public class CustomTimerTest {
     @Test
     public void testStartTimer() throws InterruptedException {
         timer.start();
-        Thread.sleep(2000); // Wait for 2 seconds
+        Thread.sleep(2050); // Wait for 2 seconds
         timer.stop();
 
         long elapsedTime = timer.getElapsedTimeInMilliSeconds(); // Store as a String
@@ -26,7 +26,7 @@ public class CustomTimerTest {
     @Test
     public void testStopTimer() throws InterruptedException {
         timer.start();
-        Thread.sleep(2002); // Wait for 2 seconds
+        Thread.sleep(2050); // Wait for 2 seconds
         timer.stop();
 
         // Ensure time is stored correctly

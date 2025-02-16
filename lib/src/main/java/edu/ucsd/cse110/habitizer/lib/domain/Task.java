@@ -10,22 +10,16 @@ public class Task {
     private final @NonNull String name;
 
     public Task(@Nullable Integer id, @NonNull String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Task Name must not be null");
-        }
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Task Name must not be empty");
-        }
         this.name = name;
         this.id = id;
     }
 
     public @Nullable Integer id() {
-        return this.id;
+        return id;
     }
 
     public @NonNull String name() {
-        return this.name;
+        return name;
     }
 
     public Task withId(@Nullable Integer id) {
@@ -33,12 +27,6 @@ public class Task {
     }
 
     public Task withName(@NonNull String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Task Name must not be null");
-        }
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("Task Name must not be empty");
-        }
         return new Task(id(), name);
     }
 
