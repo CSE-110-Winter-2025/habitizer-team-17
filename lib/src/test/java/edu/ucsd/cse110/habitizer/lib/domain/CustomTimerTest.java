@@ -4,9 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.net.MulticastSocket;
-
-public class CustomerTimerTest {
+public class CustomTimerTest {
     private CustomTimer timer;
 
     @Before
@@ -21,7 +19,7 @@ public class CustomerTimerTest {
         timer.stop();
 
         long elapsedTime = timer.getElapsedTimeInMilliSeconds(); // Store as a String
-        assertNotEquals(0, elapsedTime/timer.MILLISECONDS_PER_SECOND); // Timer should not be at "00:00"
+        assertNotEquals(0, elapsedTime/CustomTimer.MILLISECONDS_PER_SECOND); // Timer should not be at "00:00"
     }
 
 
