@@ -2,8 +2,10 @@ package edu.ucsd.cse110.habitizer.lib.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
@@ -12,6 +14,7 @@ import edu.ucsd.cse110.observables.PlainMutableSubject;
 
 public class InMemoryDataSource {
     private int nextId = 0;
+    private final Set<Integer> taskIds = new HashSet<>();
     private final Map<Integer, Routine> routines = new HashMap<>();
     private final Map<Integer, MutableSubject<Routine>> routineSubjects = new HashMap<>();
     private final MutableSubject<List<Routine>> allRoutinesSubject = new PlainMutableSubject<>();
@@ -58,16 +61,20 @@ public class InMemoryDataSource {
         for (var task : routine.tasks()) {
             var id = task.id();
             if (id == null) {
-                newTasks.add(task.withId(getNextAvailableId()));
+                var nextAvailableId = getNextAvailableId();
+                var newTask = task.withId(nextAvailableId);
+                newTasks.add(newTask);
+                taskIds.add(nextAvailableId);
             } else {
                 newTasks.add(task);
+                taskIds.add(id);
             }
         }
         return routine.withTasks(newTasks);
     }
 
     private int getNextAvailableId() {
-        while (routines.containsKey(nextId)) nextId++;
+        while (taskIds.contains(nextId)) nextId++;
         return nextId;
     }
 
