@@ -243,6 +243,7 @@ public class MainViewModel extends ViewModel {
 
     public void setCurrentRoutineGoalTime(int time) {
         if (currentRoutine.getValue() == null) return;
+        if (time < 0) return;
         var newRoutine = currentRoutine.getValue().withGoalTime(time);
         routineRepository.save(newRoutine);
     }
@@ -256,8 +257,10 @@ public class MainViewModel extends ViewModel {
         return currentRoutine;
     }
 
-    public void appendTaskToCurrentRoutine(Task task) {
+    public void appendTaskToCurrentRoutine(String taskName) {
         if (currentRoutine.getValue() == null) return;
+        if (taskName.isBlank()) return;
+        Task task = new Task(null, taskName);
         var newRoutine = currentRoutine.getValue().withAppendedTask(task);
         System.out.println(newRoutine.tasks().get(newRoutine.tasks().size()-1));
         routineRepository.save(newRoutine);
