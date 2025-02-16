@@ -79,7 +79,7 @@ public class TaskListFragment extends Fragment {
                 activeTasks.add(newActiveTask);
             }
 
-            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks));
+            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks,0L));
 
             activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
 

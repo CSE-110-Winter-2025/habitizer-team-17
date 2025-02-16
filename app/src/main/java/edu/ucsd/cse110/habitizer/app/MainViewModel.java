@@ -200,9 +200,10 @@ public class MainViewModel extends ViewModel {
         if (task.isEmpty()) return;
 
         // Get current elapsed time from timer
-        long currentElapsedTime = timer.getElapsedTimeInMilliSeconds();
+        long currentTime = timer.getElapsedTimeInMilliSeconds();
+        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
-        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
+        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask).withPreviousTaskEndTime(currentTime));
     }
 
     public boolean checkIfAllCompleted(){

@@ -23,7 +23,6 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
     private final Consumer<Integer> onCheckedClick;
 
     MutableSubject<Boolean> onFinishedRoutine;
-    private long previousTaskEndTime = 0;
 
     public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<Boolean> onFinishedRoutine) {
         // This sets a bunch of stuff internally, which we can access
@@ -57,25 +56,17 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         binding.checkTask.setChecked(task.checked());
 
         if (task.checked()) {
-            long timeSincePrevious = task.checkedElapsedTime() - previousTaskEndTime;
 
-            long seconds = timeSincePrevious / CustomTimer.MILLISECONDS_PER_SECOND;
-            long minutes = seconds / 60;
-            if (seconds % 60 != 0) { // If there are any remaining seconds, round up
-                minutes++;
-            }
+
+            long seconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
+            long minutes = (seconds + 59)/ 60;
 
             minutes = Math.max(1, minutes);
 
             binding.timeText.setText(String.format("%dm", minutes));
-            previousTaskEndTime = task.checkedElapsedTime();
 
         } else {
-            binding.timeText.setText("");
-            // Reset previous task end time if task is unchecked
-            if (task.checkedElapsedTime() == 0) {
-                previousTaskEndTime = 0;
-            }
+            binding.timeText.setText("-");
         }
 
         onFinishedRoutine.observe(finished -> {

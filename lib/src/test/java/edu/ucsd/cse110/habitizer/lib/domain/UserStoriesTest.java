@@ -17,7 +17,7 @@ public class UserStoriesTest {
         var task = new Task(10, "Example Task");
         var routine = new Routine(1, "Morning Routine", List.of(task), 30, 0);
         var activeTask = new ActiveTask(task, false, 0);
-        var activeRoutine = new ActiveRoutine(routine, List.of(activeTask));
+        var activeRoutine = new ActiveRoutine(routine, List.of(activeTask), 0L);
         long fiveMinutesMs = 5 * 60 * 1000;
 
         var updatedTask = activeTask.withChecked(true, fiveMinutesMs);
