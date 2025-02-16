@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,19 +12,13 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
-import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
-import edu.ucsd.cse110.habitizer.app.R;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
-import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.SetGoalTimeDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
-import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
 public class TaskListFragment extends Fragment {
     private MainViewModel activityModel;
@@ -66,18 +59,18 @@ public class TaskListFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         view = FragmentTaskListBinding.inflate(inflater, container, false);
         view.taskList.setAdapter(adapter);
         activityModel.getTitle().observe(title -> view.displayedTitle.setText(title));
         activityModel.getGoalTimeDisplay().observe(goalTime -> view.goalTime.setText(goalTime));
 
-        view.nextButton.setOnClickListener(v -> {
-            activityModel.nextRoutine();
-        });
+        view.nextButton.setOnClickListener(v -> activityModel.nextRoutine());
 
         view.startButton.setOnClickListener(v -> {
             activityModel.startTimer();
+
             List<ActiveTask> activeTasks = new ArrayList<>();
             var routine = activityModel.getCurrentRoutine().getValue();
             if (routine == null) return;
@@ -87,14 +80,14 @@ public class TaskListFragment extends Fragment {
             }
 
             activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks));
-            var app = (HabitizerApplication) requireActivity().getApplication();
-            app.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+
+            activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+
         });
 
-        view.setGoalTime.setOnClickListener(v -> {
-            var dialogFragment = SetGoalTimeDialogFragment.newInstance();
-            dialogFragment.show(getParentFragmentManager(), "SetGoalTimeDialogFragment");
-        });
+        view.editButton.setOnClickListener(
+                v -> activityModel.getScreen().setValue(Screen.EDIT_ROUTINE_SCREEN)
+        );
 
         return view.getRoot();
     }

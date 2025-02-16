@@ -20,7 +20,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
-    Consumer<Integer> onCheckedClick;
+    private final Consumer<Integer> onCheckedClick;
 
     MutableSubject<Boolean> onFinishedRoutine;
     private long previousTaskEndTime = 0;
