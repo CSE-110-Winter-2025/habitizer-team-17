@@ -211,10 +211,6 @@ public class MainViewModel extends ViewModel {
         return result;
     }
 
-    public MutableSubject<Integer> getGoalTime() {
-        return goalTime;
-    }
-
     private void updateCurrentTimeDisplay(long currentTime) {
         currentTimeDisplay.setValue(getFormattedTime(currentTime));
     }
@@ -270,17 +266,6 @@ public class MainViewModel extends ViewModel {
         if (time < 0) return;
         var newRoutine = currentRoutine.getValue().withGoalTime(time);
         routineRepository.save(newRoutine);
-    }
-
-    public int getRoutineGoalTime(int id) {
-        Routine routine = Objects.requireNonNull(routineRepository.find(id).getValue());
-        return routine.goalTime();
-    }
-
-    public void updateGoalTimeDisplay(int time) {
-        String newGoalTimeDisplay = time + "m";
-        goalTimeDisplay.setValue(newGoalTimeDisplay);
-        goalTimeDisplay.setValue(newGoalTimeDisplay);
     }
 
 

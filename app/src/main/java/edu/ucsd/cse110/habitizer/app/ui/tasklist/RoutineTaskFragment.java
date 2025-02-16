@@ -87,6 +87,14 @@ public class RoutineTaskFragment extends Fragment {
             view.routineTitle.setText(activeRoutine.routine().name());
         });
 
+        activityModel.getGoalTimeDisplay().observe(
+                goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
+        );
+
+        activityModel.getIsTimerRunning().observe(isRunning -> {
+            if (isRunning == null) return;
+            view.stopButton.setEnabled(isRunning);
+        });
 
         activityModel.getOnFinishedRoutine().observe(finished -> {
             if (finished == null) return;
