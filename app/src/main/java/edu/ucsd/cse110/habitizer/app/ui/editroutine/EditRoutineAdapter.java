@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import androidx.fragment.app.FragmentActivity;
 
 import androidx.annotation.NonNull;
 
@@ -44,6 +45,19 @@ public class EditRoutineAdapter extends ArrayAdapter<Task> {
 
         // Populate the view with the edit tasks's data.
         binding.editTaskNameText.setText(editTask.name());
+        binding.editTaskNameText.setOnClickListener(v -> {
+            var task = getItem(position);
+            if (task != null && task.id() != null) {
+                var dialogFragment = edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.EditTaskDialogFragment.newInstance(task.id(), task.name());
+                // We need to get the FragmentManager from the context
+                if (getContext() instanceof FragmentActivity) {
+                    dialogFragment.show(
+                            ((FragmentActivity) getContext()).getSupportFragmentManager(),
+                            "EditTaskDialogFragment"
+                    );
+                }
+            }
+        });
 
         return binding.getRoot();
     }

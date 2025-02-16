@@ -12,7 +12,6 @@
         android:layout_marginStart="48dp"
         android:text="@string/task_name"
         android:textSize="20sp"
-        android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"

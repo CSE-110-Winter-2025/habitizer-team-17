@@ -153,26 +153,6 @@ public class MainViewModel extends ViewModel {
 
         currentRoutine.observe(routine -> {
             if (routine == null) return;
-            // Observe all tasks in the routine for changes
-            for (Task task : routine.tasks()) {
-                taskRepository.find(task.id()).observe(updatedTask -> {
-                    if (updatedTask == null) return;
-                    // Refresh the ordered tasks list when any task changes
-                    if (taskOrdering.getValue() != null) {
-                        var tasks = new ArrayList<Task>();
-                        for (var id : taskOrdering.getValue()) {
-                            var t = taskRepository.find(id).getValue();
-                            if (t == null) return;
-                            tasks.add(t);
-                        }
-                        orderedTasks.setValue(tasks);
-                    }
-                });
-            }
-        });
-
-        currentRoutine.observe(routine -> {
-            if (routine == null) return;
         });
 
         currentTime.observe(time -> {
@@ -210,18 +190,6 @@ public class MainViewModel extends ViewModel {
         currentRoutine.setValue(orderedRoutines.getValue().get(nextSortOrder));
     }
 
-    private void refreshCurrentRoutine() {
-        Routine routine = currentRoutine.getValue();
-        if (routine == null) return;
-        List<Task> updatedTasks = new ArrayList<>();
-        for (Task task : routine.tasks()) {
-            Task updatedTask = taskRepository.find(task.id()).getValue();
-            updatedTasks.add(updatedTask);
-        }
-        // Update the currentRoutine with the refreshed tasks
-        currentRoutine.setValue(routine.withTasks(updatedTasks));
-    }
-
     public void checkTask(Integer id) {
         if (this.activeRoutine.getValue() == null) {
             return;
@@ -251,7 +219,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public void startTimer() {
-        refreshCurrentRoutine();
         timer.reset();
         timer.start();
         isTimerRunning.setValue(true);
@@ -362,6 +329,11 @@ public class MainViewModel extends ViewModel {
     }
 
     public void renameTask(int taskId, String newName) {
-        taskRepository.rename(taskId, newName);
+        if (currentRoutine.getValue() == null) return;
+        if (newName.isBlank()) return;
+
+        var routine = currentRoutine.getValue();
+        var updatedRoutine = routine.withRenamedTask(taskId, newName);
+        routineRepository.save(updatedRoutine);
     }
 }
