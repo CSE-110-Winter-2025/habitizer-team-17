@@ -83,11 +83,6 @@ public class RoutineTaskFragment extends Fragment {
             if(finished) {
                 view.stopButton.setEnabled(false);
                 view.endRoutineButton.setEnabled(false);
-
-                for(int i = 0; i < view.activeList.getChildCount(); i++){
-
-                    view.activeList.getChildAt(i).setEnabled(false);
-                }
                 view.backButton.setVisibility(View.VISIBLE);
             }
         });

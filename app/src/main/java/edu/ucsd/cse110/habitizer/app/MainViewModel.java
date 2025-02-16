@@ -340,10 +340,6 @@ public class MainViewModel extends ViewModel {
 
         stopTimer();
         onFinishedRoutine.setValue(true);
-        //need to disable all tasks
-        for(var activeTask: activeRoutine.getValue().activeTasks()){
-            activeRoutine.setValue(activeRoutine.getValue().withActiveTask(activeTask));
-        }
     }
 
     public MutableSubject<Boolean> getOnFinishedRoutine(){
