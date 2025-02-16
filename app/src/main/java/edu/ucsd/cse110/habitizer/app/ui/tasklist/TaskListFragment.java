@@ -16,6 +16,8 @@ import java.util.List;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class TaskListFragment extends Fragment {
@@ -68,7 +70,19 @@ public class TaskListFragment extends Fragment {
 
         view.startButton.setOnClickListener(v -> {
             activityModel.startTimer();
+
+            List<ActiveTask> activeTasks = new ArrayList<>();
+            var routine = activityModel.getCurrentRoutine().getValue();
+            if (routine == null) return;
+            for (var task : routine.tasks()) {
+                ActiveTask newActiveTask = new ActiveTask(task, false);
+                activeTasks.add(newActiveTask);
+            }
+
+            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks));
+
             activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+
         });
 
         view.editButton.setOnClickListener(

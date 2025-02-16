@@ -12,15 +12,30 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+
+import edu.ucsd.cse110.habitizer.app.HabitizerApplication;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
+
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+
+import edu.ucsd.cse110.habitizer.app.Screen;
+import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+import edu.ucsd.cse110.habitizer.lib.domain.Task;
+import edu.ucsd.cse110.observables.MutableSubject;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
     private RoutineScreenBinding view;
     private RoutineTaskAdapter adapter;
+
+
+
 
     public RoutineTaskFragment() {
         // Required empty constructor
@@ -44,7 +59,14 @@ public class RoutineTaskFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
-        this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> activityModel.checkTask(id));
+
+        this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
+            activityModel.checkTask(id);
+            if(activityModel.checkIfAllCompleted()){
+                activityModel.endRoutine();
+            }
+        }, activityModel.getOnFinishedRoutine());
+
         activityModel.getActiveRoutine().observe(routine -> {
             if (routine == null) return;
             adapter.clear();
@@ -65,22 +87,46 @@ public class RoutineTaskFragment extends Fragment {
             view.routineTitle.setText(activeRoutine.routine().name());
         });
 
-        activityModel.getGoalTimeDisplay().observe(
-                goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
-        );
 
-        activityModel.getIsTimerRunning().observe(isRunning -> {
-            if (isRunning == null) return;
-            view.stopButton.setEnabled(isRunning);
+        activityModel.getOnFinishedRoutine().observe(finished -> {
+            if (finished == null) return;
+            if(finished) {
+                view.stopButton.setEnabled(false);
+                view.endRoutineButton.setEnabled(false);
+                view.backButton.setVisibility(View.VISIBLE);
+            }
         });
 
-        activityModel.getCurrentTimeDisplay().observe(
-                currentTimeDisplay -> view.timerDisplay.setText(currentTimeDisplay)
-        );
+        view.backButton.setVisibility(View.GONE);
+        view.backButton.setOnClickListener(v -> {
+            activityModel.getScreen().setValue(Screen.PREVIEW_SCREEN);
+            activityModel.resetRoutine();
+        });
 
+        activityModel.getCurrentTimeDisplay().observe(o -> {
+            if(activityModel.getIsTimerRunning().getValue()) {
+                view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue());
+            }
+        });
+
+
+        activityModel.getCompletedTimeDisplay().observe(o -> {
+                if(!activityModel.getIsTimerRunning().getValue()) {
+                    view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
+                }
+        });
         // Button click listeners
-        view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
-        view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+        view.endRoutineButton.setOnClickListener(v -> {
+            activityModel.endRoutine();
+        });
+
+        if(activityModel.isMocked()) {
+            view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
+            view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
+        } else {
+            view.fastForwardButton.setVisibility(View.GONE);
+            view.stopButton.setVisibility(View.GONE);
+        }
 
         return view.getRoot();
     }

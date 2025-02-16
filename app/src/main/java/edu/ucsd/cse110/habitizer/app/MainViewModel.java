@@ -15,6 +15,7 @@ import java.util.Objects;
 
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
+import edu.ucsd.cse110.habitizer.lib.domain.MockTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
@@ -33,12 +34,18 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<String> title;
     private final MutableSubject<List<Task>> orderedTasks;
     private final CustomTimer timer;
-    private final MutableSubject<String> currentTime;
+    private final MutableSubject<Long> currentTime;
     private final MutableSubject<String> currentTimeDisplay;
-    private final MutableSubject<String> completedTime;
+    private final MutableSubject<String> completedTimeDisplay;
     private final MutableSubject<Boolean> isTimerRunning;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
+
+    private final MutableSubject<Boolean> onFinishedRoutine;
+
+
+
+    private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -48,9 +55,8 @@ public class MainViewModel extends ViewModel {
         @Override
         public void run() {
             if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-                String formatted = timer.getFormattedTime();
-                currentTime.setValue(formatted);
-                handler.postDelayed(this, 1000);
+                currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+                handler.postDelayed(this, CustomTimer.MILLISECONDS_PER_SECOND);
             }
         }
     };
@@ -78,16 +84,21 @@ public class MainViewModel extends ViewModel {
         this.title = new PlainMutableSubject<>();
         this.activeRoutine = new PlainMutableSubject<>();
 
-        this.completedTime = new PlainMutableSubject<>();
+        this.completedTimeDisplay = new PlainMutableSubject<>();
         this.isTimerRunning = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
         this.currentTimeDisplay = new PlainMutableSubject<>();
-        this.timer = new CustomTimer();
+        this.onFinishedRoutine = new PlainMutableSubject<>(false);
+        if(!isMocked) {
+            this.timer = new CustomTimer();
+        } else {
+            this.timer = new MockTimer();
+        }
         this.goalTime = new PlainMutableSubject<>();
         this.goalTimeDisplay = new PlainMutableSubject<>();
-        this.currentTime.setValue("0m");
+        this.currentTime.setValue((long)0);
         isTimerRunning.setValue(false);
-        completedTime.setValue("");
+        completedTimeDisplay.setValue("");
 
         // Load routines when changed and order them
         routineRepository.findAll().observe(routines -> {
@@ -142,13 +153,6 @@ public class MainViewModel extends ViewModel {
 
         currentRoutine.observe(routine -> {
             if (routine == null) return;
-            List<ActiveTask> activeTasks = new ArrayList<>();
-            for (var task : routine.tasks()) {
-                ActiveTask newActiveTask = new ActiveTask(task, false);
-                activeTasks.add(newActiveTask);
-            }
-
-            activeRoutine.setValue(new ActiveRoutine(routine, activeTasks));
         });
 
         currentTime.observe(time -> {
@@ -198,13 +202,25 @@ public class MainViewModel extends ViewModel {
         activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask));
     }
 
-    private void updateCurrentTimeDisplay(String currentTime) {
-        currentTimeDisplay.setValue(currentTime);
+    public boolean checkIfAllCompleted(){
+        boolean result = true;
+        for(var task: activeRoutine.getValue().activeTasks()){
+            if(!task.checked())
+                result = false;
+        }
+        return result;
+    }
+
+    public MutableSubject<Integer> getGoalTime() {
+        return goalTime;
+    }
+
+    private void updateCurrentTimeDisplay(long currentTime) {
+        currentTimeDisplay.setValue(getFormattedTime(currentTime));
     }
 
     public void startTimer() {
         timer.reset();
-        completedTime.setValue("00:00");
         timer.start();
         isTimerRunning.setValue(true);
         // Start the periodic update of currentTime
@@ -213,18 +229,20 @@ public class MainViewModel extends ViewModel {
 
     public void stopTimer() {
         if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-            timer.stop();
+            MockTimer t = (MockTimer)timer;
+            t.stop();
             isTimerRunning.setValue(false);
             // Stop the periodic updates
             handler.removeCallbacks(updateCurrentTimeRunnable);
-            String finalTime = currentTimeDisplay.getValue();
-            completedTime.setValue(finalTime);
+            String finalTime = getFormattedTime(currentTime.getValue() + 59*CustomTimer.MILLISECONDS_PER_SECOND);
+            completedTimeDisplay.setValue(finalTime);
         }
     }
 
     public void forwardTimer() {
-        timer.forward();
-        currentTimeDisplay.setValue(timer.getFormattedTime());
+        MockTimer mockedTimer = (MockTimer)timer;
+        mockedTimer.forward();
+        currentTimeDisplay.setValue(getFormattedTime(timer.getElapsedTimeInMilliSeconds()));
     }
 
     public MutableSubject<String> getTitle() {
@@ -239,11 +257,11 @@ public class MainViewModel extends ViewModel {
         return isTimerRunning;
     }
 
-    public MutableSubject<String> getCompletedTime() {
-        return completedTime;
+    public MutableSubject<String> getCompletedTimeDisplay() {
+        return completedTimeDisplay;
     }
 
-    public MutableSubject<String> getCurrentTime() {
+    public MutableSubject<Long> getCurrentTime() {
         return currentTime;
     }
 
@@ -252,6 +270,17 @@ public class MainViewModel extends ViewModel {
         if (time < 0) return;
         var newRoutine = currentRoutine.getValue().withGoalTime(time);
         routineRepository.save(newRoutine);
+    }
+
+    public int getRoutineGoalTime(int id) {
+        Routine routine = Objects.requireNonNull(routineRepository.find(id).getValue());
+        return routine.goalTime();
+    }
+
+    public void updateGoalTimeDisplay(int time) {
+        String newGoalTimeDisplay = time + "m";
+        goalTimeDisplay.setValue(newGoalTimeDisplay);
+        goalTimeDisplay.setValue(newGoalTimeDisplay);
     }
 
 
@@ -272,10 +301,42 @@ public class MainViewModel extends ViewModel {
         routineRepository.save(newRoutine);
     }
 
+    public boolean isMocked(){
+        return isMocked;
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
         // Remove any pending callbacks to avoid memory leaks
         handler.removeCallbacks(updateCurrentTimeRunnable);
+    }
+
+
+    public String getFormattedTime(long milliseconds) {
+
+        long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+
+        return (hours > 0)
+                ? String.format("%dh:%02d/", hours, minutes)
+                : String.format("%dm/", minutes);
+    }
+
+
+    public void endRoutine(){
+
+        stopTimer();
+        onFinishedRoutine.setValue(true);
+    }
+
+    public MutableSubject<Boolean> getOnFinishedRoutine(){
+        return onFinishedRoutine;
+    }
+
+    public void resetRoutine(){
+        onFinishedRoutine.setValue(false);
+
     }
 }
