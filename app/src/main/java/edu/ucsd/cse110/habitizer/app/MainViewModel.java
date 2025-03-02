@@ -113,14 +113,17 @@ public class MainViewModel extends ViewModel {
 
         // Set currently displayed routine
         orderedRoutines.observe(routines -> {
-            if (routines == null) return;
+            if (routines == null || routines.isEmpty()) {
+                // Optionally: clear currentRoutine or set to null
+                currentRoutine.setValue(null);
+                return;
+            }
             if (currentRoutine.getValue() == null) {
                 currentRoutine.setValue(routines.get(0));
                 return;
             }
-
-            // replace current routine with routine with same id if it exists
-            // else default to first routine
+            // Replace current routine with routine with same id if it exists,
+            // else default to the first routine.
             var routineWithSameId = routines.stream()
                     .filter(routine -> Objects.equals(routine.id(), currentRoutine.getValue().id()))
                     .findFirst();
@@ -132,7 +135,6 @@ public class MainViewModel extends ViewModel {
         });
 
 
-        // Update title when current routine changes
         currentRoutine.observe(routine -> {
             if (routine == null) return;
             title.setValue(routine.name());

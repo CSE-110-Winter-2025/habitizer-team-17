@@ -48,9 +48,10 @@ public class PlainMutableSubject<T> implements MutableSubject<T> {
 
     @Override
     public void setValue(T newValue) {
-        value.set(Optional.of(newValue));
+        value.set(Optional.ofNullable(newValue));
         notifyObservers();
     }
+
 
     @Override
     public boolean hasObservers() {
