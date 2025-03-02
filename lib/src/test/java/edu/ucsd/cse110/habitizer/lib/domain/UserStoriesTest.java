@@ -41,7 +41,7 @@ public class UserStoriesTest {
     @Test
     public void testRenameTaskInRoutine() {
         var dataSource = new InMemoryDataSource();
-        var routineRepo = new RoutineRepository(dataSource);
+        var routineRepo = new SimpleRoutineRepository(dataSource);
 
         var task = new Task(101, "Old Name");
         var routine = new Routine(201, "My Routine", List.of(task), 20, 0);
@@ -60,7 +60,7 @@ public class UserStoriesTest {
     @Test
     public void testRenameOneTaskAmongMany() {
         var dataSource = new InMemoryDataSource();
-        var routineRepo = new RoutineRepository(dataSource);
+        var routineRepo = new SimpleRoutineRepository(dataSource);
 
         var task1 = new Task(1, "First Task");
         var task2 = new Task(2, "Second Task");
