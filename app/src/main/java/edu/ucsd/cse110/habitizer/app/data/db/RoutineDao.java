@@ -27,6 +27,9 @@ public interface RoutineDao {
     @Query("SELECT * FROM routines")
     List<RoutineEntity> findAllSync();
 
+    @Query("SELECT * FROM routines WHERE id = :id LIMIT 1")
+    RoutineEntity findByIdSync(int id);
+
     @Update
     void update(RoutineEntity routine);
 

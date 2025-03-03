@@ -9,21 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * A plain old LiveData-like subject that can be observed, but with no Android dependencies, and
- * NOT lifecycle aware!
- * <p>
- * This is the implementation you actually want to use in your tests.
- * <p>
- * The implementation here is substantially more advanced than the one used in labs. It covers
- * a bunch of weird edge cases that come into play when we start mixing our {@link Subject}s with
- * Android LiveData, so that you don't have to worry about them.
- * <p>
- * You do not need to understand the code below, but if you're curious, feel free to ask me in
- * office hours. –Dylan
- *
- * @param <T> The type of the value that the subject holds.
- */
 public class PlainMutableSubject<T> implements MutableSubject<T> {
     private final AtomicReference<Optional<T>> value = new AtomicReference<>(Optional.empty());
     private final ConcurrentLinkedQueue<Observer<T>> observers = new ConcurrentLinkedQueue<>();
@@ -46,11 +31,12 @@ public class PlainMutableSubject<T> implements MutableSubject<T> {
         return value.get().orElse(null);
     }
 
-    @Override
+  @Override
     public void setValue(T newValue) {
         value.set(Optional.ofNullable(newValue));
         notifyObservers();
     }
+
 
 
     @Override
