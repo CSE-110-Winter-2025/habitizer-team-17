@@ -24,6 +24,9 @@ public interface RoutineDao {
     @Query("SELECT * FROM routines ORDER BY sort_order ASC")
     LiveData<List<RoutineEntity>> findAll();
 
+    @Query("SELECT * FROM routines")
+    List<RoutineEntity> findAllSync();
+
     @Update
     void update(RoutineEntity routine);
 

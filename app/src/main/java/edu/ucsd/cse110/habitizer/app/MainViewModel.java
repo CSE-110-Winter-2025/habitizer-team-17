@@ -286,10 +286,18 @@ public class MainViewModel extends ViewModel {
     public void appendTaskToCurrentRoutine(String taskName) {
         if (currentRoutine.getValue() == null) return;
         if (taskName.isBlank()) return;
+
+        // Create a new task with null ID - the repository will assign an ID
         Task task = new Task(null, taskName);
+
+        // Create a new routine with the appended task
         var newRoutine = currentRoutine.getValue().withAppendedTask(task);
-        System.out.println(newRoutine.tasks().get(newRoutine.tasks().size()-1));
+
+        // Save to repository (which will persist to database)
         routineRepository.save(newRoutine);
+
+        // Add logging to track what's happening
+        System.out.println("Task added: " + taskName + " to routine: " + newRoutine.name());
     }
 
     public boolean isMocked(){
