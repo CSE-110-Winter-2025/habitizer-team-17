@@ -13,5 +13,6 @@
     <string name="add_task">Add Task</string>
     <string name="edit">Edit</string>
     <string name="new_task_name">New Task Name</string>
+    <string name="new_routine_name_text">New Routine Name</string>
     <string name="add">Add</string>
 </resources>
