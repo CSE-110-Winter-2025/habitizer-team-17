@@ -44,8 +44,12 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(project(":lib"))
     implementation(project(":observables"))
+    implementation(libs.androidx.room.common)
+    implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.room.runtime)
     testImplementation(libs.junit4)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.ext.espresso.core)
+    annotationProcessor(libs.androidx.room.compiler)
 }
