@@ -45,6 +45,7 @@ public class MainViewModel extends ViewModel {
 
 
 
+
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
     // TODO: CITE

@@ -47,8 +47,8 @@ public class AddRoutineDialogFragment extends DialogFragment {
         this.view = FragmentDialogAddRoutineBinding.inflate(getLayoutInflater());
 
         var dialog = new AlertDialog.Builder(getActivity())
-                .setTitle("Add Task")
-                .setMessage("Please provide the new task name.")
+                .setTitle("Add Routine")
+                .setMessage("Please provide the new routine name.")
                 .setView(view.getRoot())
                 .setPositiveButton("Add", this::onPositiveButtonClick)
                 .setNegativeButton("Cancel", this::onNegativeButtonClick)
@@ -58,7 +58,7 @@ public class AddRoutineDialogFragment extends DialogFragment {
             var positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positiveButton.setEnabled(false);
 
-            view.addTaskNameText.addTextChangedListener(new TextWatcher() {
+            view.addRoutineNameText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -80,7 +80,7 @@ public class AddRoutineDialogFragment extends DialogFragment {
     }
 
     private void onPositiveButtonClick(DialogInterface dialog, int which){
-        var name = view.addTaskNameText.getText().toString().strip();
+        var name = view.addRoutineNameText.getText().toString().strip();
         activityModel.appendTaskToCurrentRoutine(name);
         dialog.dismiss();
     }
