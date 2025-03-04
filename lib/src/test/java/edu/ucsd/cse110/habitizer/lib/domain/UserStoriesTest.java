@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
-
 /**
  * Tests for US6 (tracking checked-off task time) and US10 (renaming tasks).
  */
@@ -79,4 +78,5 @@ public class UserStoriesTest {
         assertEquals("Renamed Second Task", tasks.get(1).name());
         assertEquals("Third Task", tasks.get(2).name());
     }
+
 }

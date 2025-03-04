@@ -81,7 +81,7 @@ public class AddRoutineDialogFragment extends DialogFragment {
 
     private void onPositiveButtonClick(DialogInterface dialog, int which){
         var name = view.addRoutineNameText.getText().toString().strip();
-        activityModel.appendTaskToCurrentRoutine(name);
+        activityModel.addRoutineToEnd(name);
         dialog.dismiss();
     }
 
