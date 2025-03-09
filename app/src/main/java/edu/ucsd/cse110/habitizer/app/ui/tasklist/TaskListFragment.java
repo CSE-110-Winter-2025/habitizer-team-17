@@ -16,6 +16,7 @@ import java.util.List;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
+import edu.ucsd.cse110.habitizer.app.ui.editroutine.dialog.AddRoutineDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
@@ -88,6 +89,11 @@ public class TaskListFragment extends Fragment {
         view.editButton.setOnClickListener(
                 v -> activityModel.getScreen().setValue(Screen.EDIT_ROUTINE_SCREEN)
         );
+
+        view.addButton.setOnClickListener(v -> {
+            var dialogFragment = AddRoutineDialogFragment.newInstance();
+            dialogFragment.show(getParentFragmentManager(), "AddRoutineDialogFragment");
+        });
 
         return view.getRoot();
     }
