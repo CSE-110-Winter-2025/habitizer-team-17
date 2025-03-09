@@ -362,4 +362,12 @@ public class MainViewModel extends ViewModel {
         Routine newRoutine = new Routine(sortOrder + 1, routineName, new ArrayList<>(), 0, sortOrder + 1);
         routineRepository.save(newRoutine);
     }
+
+    public void deleteTask(int id) {
+        if (currentRoutine.getValue() == null) return;
+
+        var routine = currentRoutine.getValue();
+        var updatedRoutine = routine.withoutTask(id);
+        routineRepository.save(updatedRoutine);
+    }
 }
