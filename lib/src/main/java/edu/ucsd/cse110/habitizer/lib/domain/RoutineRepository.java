@@ -10,4 +10,7 @@ public interface RoutineRepository {
     MutableSubject<List<Routine>> findAll();
 
     void save(Routine routine);
+
+
+    void delete(Routine routine);
 }

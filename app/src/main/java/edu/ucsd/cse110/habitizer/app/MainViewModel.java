@@ -45,7 +45,6 @@ public class MainViewModel extends ViewModel {
 
 
 
-
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
     // TODO: CITE
@@ -347,6 +346,11 @@ public class MainViewModel extends ViewModel {
         var routine = currentRoutine.getValue();
         var updatedRoutine = routine.withRenamedTask(taskId, newName);
         routineRepository.save(updatedRoutine);
+    }
+
+
+    public void removeRoutine(Routine routine){
+        routineRepository.delete(routine);
     }
 
     public void addRoutineToEnd(String routineName) {

@@ -113,4 +113,20 @@ public class RoomRoutineRepository implements RoutineRepository {
             }
         });
     }
+
+    public void delete(Routine routine) {
+        executor.execute(() -> {
+            try {
+                Log.d(TAG, "Deleting routine: " + routine.name() + " (ID: " + routine.id() + ")");
+                RoutineEntity entity = RoutineEntity.fromDomain(routine);
+                routineDao.delete(entity);
+                routineDao.findAndChangeAboveOrdering(routine.sortOrder());
+                Log.d(TAG, "Routine deleted successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Error deleting routine: " + e.getMessage());
+                e.printStackTrace();
+
+            }
+        });
+    }
 }
