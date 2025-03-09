@@ -16,4 +16,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/card_delete_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.924"
+        app:layout_constraintStart_toEndOf="@+id/edit_task_name_text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_cross"
+        app:tint="?android:attr/textColorSecondary" />
 </androidx.constraintlayout.widget.ConstraintLayout>
