@@ -51,11 +51,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         return binding.getRoot();
     }
 
-    private void showRenameDialog(int taskId, String currentName) {
-        var dialog = EditTaskDialogFragment.newInstance(taskId, currentName);
-        dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "EditTaskDialog");
-    }
-
 
     // The below methods aren't strictly necessary, usually.
     // But get in the habit of defining them because they never hurt
