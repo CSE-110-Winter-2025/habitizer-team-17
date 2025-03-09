@@ -10,10 +10,11 @@ import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
+import edu.ucsd.cse110.habitizer.lib.domain.Task;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
 import edu.ucsd.cse110.observables.MutableSubject;
 
-public class DeleteRoutineTest {
+public class DeleteTaskTest {
     private MainViewModel viewModel;
     private FakeRoutineRepository fakeRepo;
 
@@ -21,9 +22,17 @@ public class DeleteRoutineTest {
         private final MutableSubject<List<Routine>> routines = new PlainMutableSubject<>(new ArrayList<>());
 
         public FakeRoutineRepository() {
+            List<Task> tasks1 = new ArrayList<>();
+            tasks1.add(new Task(101, "Task A"));
+            tasks1.add(new Task(102, "Task B"));
+
+            List<Task> tasks2 = new ArrayList<>();
+            tasks2.add(new Task(201, "Task C"));
+            tasks2.add(new Task(202, "Task D"));
+
             List<Routine> newList = new ArrayList<>();
-            newList.add(new Routine(1, "test 1", new ArrayList<>(), 0, 0));
-            newList.add(new Routine(2, "test 2", new ArrayList<>(), 0, 0));
+            newList.add(new Routine(1, "Routine 1", tasks1, 0, 0));
+            newList.add(new Routine(2, "Routine 2", tasks2, 0, 0));
             routines.setValue(newList);
         }
 
@@ -40,7 +49,8 @@ public class DeleteRoutineTest {
         @Override
         public void save(Routine routine) {
             List<Routine> newList = new ArrayList<>(routines.getValue());
-            newList.add(routine);
+            newList.removeIf(r -> r.id() != null && r.id().equals(routine.id())); // Remove old version
+            newList.add(routine); // Add updated version
             routines.setValue(newList);
         }
 
@@ -58,21 +68,15 @@ public class DeleteRoutineTest {
     }
 
     @Test
-    public void testAddRoutineToEnd() {
-        viewModel.removeRoutine(viewModel.getCurrentRoutine().getValue());
-        List<Routine> routines = fakeRepo.findAll().getValue();
+    public void testDeleteTaskFromRoutine() {
+        Routine currentRoutine = fakeRepo.findAll().getValue().get(0);
+        assertNotNull(currentRoutine);
+        assertEquals(2, currentRoutine.tasks().size());
 
-        assertEquals(1, routines.size());
-        assertFalse(routines.get(0).name().equals("test 1"));
-        assertEquals("test 2", routines.get(0).name());
+        int taskIdToDelete = currentRoutine.tasks().get(0).id();
+        viewModel.deleteTask(taskIdToDelete);
 
-        viewModel.removeRoutine(viewModel.getCurrentRoutine().getValue());
-        viewModel.addRoutineToEnd("test 3");
-        viewModel.addRoutineToEnd("test 4");
-        viewModel.removeRoutine(viewModel.getCurrentRoutine().getValue());
-        routines = fakeRepo.findAll().getValue();
-        assertEquals(1, routines.size());
-        assertFalse(routines.get(0).name().equals("test 3"));
-        assertEquals("test 4", routines.get(0).name());
+        Routine updatedRoutine = fakeRepo.findAll().getValue().get(0);
+        assertFalse(updatedRoutine.tasks().stream().anyMatch(task -> task.id() == taskIdToDelete));
     }
 }
