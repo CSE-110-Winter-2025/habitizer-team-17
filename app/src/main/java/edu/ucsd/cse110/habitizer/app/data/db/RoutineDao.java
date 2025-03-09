@@ -30,6 +30,9 @@ public interface RoutineDao {
     @Query("SELECT * FROM routines WHERE id = :id LIMIT 1")
     RoutineEntity findByIdSync(int id);
 
+    @Query("UPDATE routines SET sort_order = sort_order - 1 WHERE sort_order >= :sortOrder")
+    void findAndChangeAboveOrdering(int sortOrder);
+
     @Update
     void update(RoutineEntity routine);
 

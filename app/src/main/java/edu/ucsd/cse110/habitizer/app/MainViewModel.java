@@ -347,4 +347,9 @@ public class MainViewModel extends ViewModel {
         var updatedRoutine = routine.withRenamedTask(taskId, newName);
         routineRepository.save(updatedRoutine);
     }
+
+
+    public void removeRoutine(Routine routine){
+        routineRepository.delete(routine);
+    }
 }

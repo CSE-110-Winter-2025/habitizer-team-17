@@ -79,6 +79,10 @@ public class EditRoutineFragment extends Fragment {
                 v -> activityModel.getScreen().setValue(Screen.PREVIEW_SCREEN)
         );
 
+        view.routineDeleteButton.setOnClickListener(
+                v -> activityModel.removeRoutine(activityModel.getCurrentRoutine().getValue())
+        );
+
         return view.getRoot();
     }
 }

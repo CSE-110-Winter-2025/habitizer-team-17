@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.ucsd.cse110.habitizer.lib.data.InMemoryDataSource;
 import edu.ucsd.cse110.observables.MutableSubject;
+import kotlin.NotImplementedError;
 
 public class SimpleRoutineRepository implements RoutineRepository {
     private final InMemoryDataSource dataSource;
@@ -26,5 +27,10 @@ public class SimpleRoutineRepository implements RoutineRepository {
     @Override
     public void save(Routine routine) {
         dataSource.putRoutine(routine);
+    }
+
+
+    public void delete(Routine routine) {
+        throw new NotImplementedError();
     }
 }
