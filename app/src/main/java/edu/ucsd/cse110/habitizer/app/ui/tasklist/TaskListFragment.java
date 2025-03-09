@@ -17,6 +17,7 @@ import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.Screen;
 import edu.ucsd.cse110.habitizer.app.databinding.FragmentTaskListBinding;
 import edu.ucsd.cse110.habitizer.app.ui.editroutine.dialog.AddRoutineDialogFragment;
+import edu.ucsd.cse110.habitizer.app.databinding.ListItemEditTaskBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;

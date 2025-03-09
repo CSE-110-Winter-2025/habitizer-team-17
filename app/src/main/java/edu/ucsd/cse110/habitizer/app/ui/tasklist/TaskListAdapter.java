@@ -16,6 +16,7 @@ import java.util.Objects;
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.TaskBinding;
 import edu.ucsd.cse110.habitizer.app.ui.tasklist.dialog.EditTaskDialogFragment;
+import edu.ucsd.cse110.habitizer.app.ui.editroutine.dialog.DeleteTaskDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
@@ -59,6 +60,10 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
     private void showRenameDialog(int taskId, String currentName) {
         var dialog = EditTaskDialogFragment.newInstance(taskId, currentName);
         dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "EditTaskDialog");
+    }
+
+    private void showDeleteDialog(int taskId, String currentName) {
+
     }
 
     // The below methods aren't strictly necessary, usually.
