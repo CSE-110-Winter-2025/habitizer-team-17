@@ -47,12 +47,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         }
 
         binding.taskName.setText(task.name());
-        binding.taskName.setOnClickListener(v -> {
-            var id = task.id();
-            assert id != null;
-            showRenameDialog(id, task.name());
-        });
-
 
         return binding.getRoot();
     }
@@ -62,9 +56,6 @@ public class TaskListAdapter extends ArrayAdapter<Task> {
         dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "EditTaskDialog");
     }
 
-    private void showDeleteDialog(int taskId, String currentName) {
-
-    }
 
     // The below methods aren't strictly necessary, usually.
     // But get in the habit of defining them because they never hurt
