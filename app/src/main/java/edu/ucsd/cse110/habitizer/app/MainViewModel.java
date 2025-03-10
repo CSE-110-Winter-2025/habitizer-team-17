@@ -42,8 +42,7 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<String> goalTimeDisplay;
 
     private final MutableSubject<Boolean> onFinishedRoutine;
-
-
+    private boolean isAddingNewRoutine = false;
 
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
 
@@ -118,11 +117,24 @@ public class MainViewModel extends ViewModel {
                 currentRoutine.setValue(null);
                 return;
             }
+
             if (currentRoutine.getValue() == null) {
                 currentRoutine.setValue(routines.get(0));
                 return;
             }
-            // Replace current routine with routine with same id if it exists,
+
+            // If we're adding a new routine, look for the one with the highest sort order
+            if (isAddingNewRoutine) {
+                Routine highestSortOrderRoutine = routines.stream()
+                        .max(Comparator.comparingInt(Routine::sortOrder))
+                        .orElse(routines.get(0));
+
+                currentRoutine.setValue(highestSortOrderRoutine);
+                isAddingNewRoutine = false; // Reset the flag
+                return;
+            }
+
+            // Normal case: Replace current routine with routine with same id if it exists,
             // else default to the first routine.
             var routineWithSameId = routines.stream()
                     .filter(routine -> Objects.equals(routine.id(), currentRoutine.getValue().id()))
@@ -185,11 +197,32 @@ public class MainViewModel extends ViewModel {
     public void nextRoutine() {
         if (orderedRoutines.getValue() == null) return;
         if (currentRoutine.getValue() == null) return;
+        if (orderedRoutines.getValue().isEmpty()) return;
 
-        var currentSortOrder = currentRoutine.getValue().sortOrder();
-        var nextSortOrder = (currentSortOrder + 1) % orderedRoutines.getValue().size();
+        // Find the current routine's position in the ordered list
+        List<Routine> routines = orderedRoutines.getValue();
+        int currentIndex = -1;
 
-        currentRoutine.setValue(orderedRoutines.getValue().get(nextSortOrder));
+        for (int i = 0; i < routines.size(); i++) {
+            if (Objects.equals(routines.get(i).id(), currentRoutine.getValue().id())) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        // If not found for some reason, default to first routine
+        if (currentIndex == -1) {
+            currentRoutine.setValue(routines.get(0));
+            return;
+        }
+
+        // Move to next routine
+        int nextIndex = (currentIndex + 1) % routines.size();
+        currentRoutine.setValue(routines.get(nextIndex));
+    }
+
+    public void navigateToNewlyCreatedRoutine(Routine newRoutine) {
+        currentRoutine.setValue(newRoutine);
     }
 
     public void checkTask(Integer id) {
@@ -357,9 +390,20 @@ public class MainViewModel extends ViewModel {
         if (orderedRoutines.getValue() == null) return;
 
         List<Routine> routines = orderedRoutines.getValue();
-        int sortOrder = routines.isEmpty() ? 0 : routines.get(routines.size() - 1).sortOrder();
+        int maxSortOrder = 0;
 
-        Routine newRoutine = new Routine(sortOrder + 1, routineName, new ArrayList<>(), 0, sortOrder + 1);
+        // Find the maximum sort order
+        for (Routine r : routines) {
+            if (r.sortOrder() > maxSortOrder) {
+                maxSortOrder = r.sortOrder();
+            }
+        }
+
+        // Set flag to indicate we're adding a new routine
+        isAddingNewRoutine = true;
+
+        // Create with sort order one higher than the max
+        Routine newRoutine = new Routine(null, routineName, new ArrayList<>(), 0, maxSortOrder + 1);
         routineRepository.save(newRoutine);
     }
 
