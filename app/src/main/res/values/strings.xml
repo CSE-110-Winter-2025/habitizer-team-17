@@ -16,4 +16,5 @@
     <string name="new_routine_name_text">New Routine</string>
     <string name="add">add routine</string>
     <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
 </resources>

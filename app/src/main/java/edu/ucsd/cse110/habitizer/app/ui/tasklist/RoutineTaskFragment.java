@@ -51,7 +51,7 @@ public class RoutineTaskFragment extends Fragment {
 
         this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
             activityModel.checkTask(id);
-            if(activityModel.checkIfAllCompleted()){
+            if (activityModel.checkIfAllCompleted()){
                 activityModel.endRoutine();
             }
         }, activityModel.getOnFinishedRoutine());
@@ -107,7 +107,6 @@ public class RoutineTaskFragment extends Fragment {
             }
         });
 
-
         activityModel.getCompletedTimeDisplay().observe(o -> {
                 if(activityModel.getTimerState().getValue() == TimerState.STOPPED) {
                     view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
@@ -124,7 +123,22 @@ public class RoutineTaskFragment extends Fragment {
             view.fastForwardButton.setVisibility(View.GONE);
         }
 
-        view.pauseButton.setOnClickListener(v -> activityModel.pauseTimer());
+        view.resumeButton.setVisibility(View.GONE);
+        view.pauseButton.setOnClickListener(v ->
+                {
+                    activityModel.pauseTimer();
+                    view.resumeButton.setVisibility(View.VISIBLE);
+                }
+        );
+
+        view.resumeButton.setOnClickListener(v -> {
+            if (activityModel.getTimerState().getValue() == TimerState.PAUSED) {
+                activityModel.resumeTimer();
+                view.resumeButton.setVisibility(View.GONE);
+                view.pauseButton.setVisibility(View.VISIBLE);
+            }
+        });
+
 
         return view.getRoot();
     }

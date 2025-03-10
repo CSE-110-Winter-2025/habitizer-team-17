@@ -168,6 +168,8 @@ public class MainViewModel extends ViewModel {
             var display = time + "m";
             goalTimeDisplay.setValue(display);
         });
+
+        // onFinishedRoutine.observe();
     }
 
     public MutableSubject<Screen> getScreen() {
@@ -193,6 +195,8 @@ public class MainViewModel extends ViewModel {
     }
 
     public void checkTask(Integer id) {
+        if (timerState.getValue() == TimerState.PAUSED) return;
+
         if (this.activeRoutine.getValue() == null) {
             return;
         }
@@ -232,6 +236,7 @@ public class MainViewModel extends ViewModel {
     public void pauseTimer() {
         timer.pause();
         timerState.setValue(TimerState.PAUSED);
+        onFinishedRoutine.setValue(true);
     }
 
     public void stopTimer() {
@@ -244,6 +249,13 @@ public class MainViewModel extends ViewModel {
             String finalTime = getFormattedTime(currentTime.getValue() + 59*CustomTimer.MILLISECONDS_PER_SECOND);
             completedTimeDisplay.setValue(finalTime);
         }
+    }
+
+    public void resumeTimer() {
+        timer.resume();
+        timerState.setValue(TimerState.RUNNING);
+        handler.post(updateCurrentTimeRunnable);
+        onFinishedRoutine.setValue(false);
     }
 
     public void forwardTimer() {
@@ -331,7 +343,6 @@ public class MainViewModel extends ViewModel {
 
 
     public void endRoutine(){
-
         stopTimer();
         onFinishedRoutine.setValue(true);
     }
@@ -342,7 +353,6 @@ public class MainViewModel extends ViewModel {
 
     public void resetRoutine(){
         onFinishedRoutine.setValue(false);
-
     }
 
     public void renameTask(int taskId, String newName) {
