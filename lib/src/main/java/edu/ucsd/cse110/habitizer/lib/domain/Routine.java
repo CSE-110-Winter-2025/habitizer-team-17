@@ -55,6 +55,12 @@ public class Routine {
         return new Routine(id(), name(), tasks, goalTime(), sortOrder());
     }
 
+    public Routine withoutTask(int id) {
+        var newTasks = new ArrayList<>(tasks);
+        newTasks.removeIf(task -> task.id() != null && task.id() == id);
+        return withTasks(newTasks);
+    }
+
     public Routine withGoalTime(@NonNull Integer goalTime) {
         return new Routine(id(), name(), tasks(), goalTime, sortOrder());
     }
