@@ -71,10 +71,25 @@ public class MainViewModel extends ViewModel {
         if (milliseconds < 0) milliseconds = 0;
 
         long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
-        long minutes = totalSeconds / 60;
 
-        // Just show the time value
-        elapsedSinceLastTaskDisplay.setValue(minutes + "m");
+        // Format according to requirements
+        String formattedTime;
+        if (totalSeconds < 60) {
+            // Less than a minute, show in 5-second increments
+            long roundedSeconds = 5 * Math.round(totalSeconds / 5.0f);
+            // If rounding gives us 60 seconds, show as 1m
+            if (roundedSeconds >= 60) {
+                formattedTime = "1m";
+            } else {
+                formattedTime = roundedSeconds + "s";
+            }
+        } else {
+            // 60 seconds or more, show in minutes
+            long minutes = totalSeconds / 60;
+            formattedTime = minutes + "m";
+        }
+
+        elapsedSinceLastTaskDisplay.setValue(formattedTime);
     }
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
@@ -387,6 +402,22 @@ public class MainViewModel extends ViewModel {
                 ? String.format("%dh:%02d/", hours, minutes)
                 : String.format("%dm/", minutes);
     }
+
+    public String formatElapsedTime(long milliseconds) {
+        if (milliseconds < 0) milliseconds = 0;
+
+        long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
+
+        // If less than a minute, show in seconds
+        if (totalSeconds < 60) {
+            return totalSeconds + "s";
+        } else {
+            // Otherwise show in minutes (ceiling to next minute if not exact)
+            long minutes = (totalSeconds + 59) / 60;  // Ceiling division
+            return minutes + "m";
+        }
+    }
+
 
 
     public void endRoutine(){
