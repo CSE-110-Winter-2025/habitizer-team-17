@@ -19,6 +19,7 @@ import edu.ucsd.cse110.habitizer.app.databinding.RoutineScreenBinding;
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
 
 import edu.ucsd.cse110.habitizer.app.Screen;
+import edu.ucsd.cse110.habitizer.lib.domain.TimerState;
 
 public class RoutineTaskFragment extends Fragment {
     private MainViewModel activityModel;
@@ -79,15 +80,16 @@ public class RoutineTaskFragment extends Fragment {
                 goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
         );
 
-        activityModel.getIsTimerRunning().observe(isRunning -> {
-            if (isRunning == null) return;
-            view.stopButton.setEnabled(isRunning);
+        activityModel.getTimerState().observe(timerState -> {
+            if (timerState == null) return;
+            view.pauseButton.setEnabled(timerState == TimerState.RUNNING);
+            view.fastForwardButton.setEnabled(timerState == TimerState.RUNNING);
         });
 
         activityModel.getOnFinishedRoutine().observe(finished -> {
             if (finished == null) return;
             if(finished) {
-                view.stopButton.setEnabled(false);
+                view.pauseButton.setEnabled(false);
                 view.endRoutineButton.setEnabled(false);
                 view.backButton.setVisibility(View.VISIBLE);
             }
@@ -100,14 +102,14 @@ public class RoutineTaskFragment extends Fragment {
         });
 
         activityModel.getCurrentTimeDisplay().observe(o -> {
-            if(activityModel.getIsTimerRunning().getValue()) {
+            if(activityModel.getTimerState().getValue() != TimerState.STOPPED) {
                 view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue());
             }
         });
 
 
         activityModel.getCompletedTimeDisplay().observe(o -> {
-                if(!activityModel.getIsTimerRunning().getValue()) {
+                if(activityModel.getTimerState().getValue() == TimerState.STOPPED) {
                     view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
                 }
         });
@@ -118,11 +120,11 @@ public class RoutineTaskFragment extends Fragment {
 
         if(activityModel.isMocked()) {
             view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
-            view.stopButton.setOnClickListener(v -> activityModel.stopTimer());
         } else {
             view.fastForwardButton.setVisibility(View.GONE);
-            view.stopButton.setVisibility(View.GONE);
         }
+
+        view.pauseButton.setOnClickListener(v -> activityModel.pauseTimer());
 
         return view.getRoot();
     }

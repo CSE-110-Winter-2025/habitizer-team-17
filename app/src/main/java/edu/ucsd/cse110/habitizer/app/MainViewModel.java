@@ -18,6 +18,7 @@ import edu.ucsd.cse110.habitizer.lib.domain.MockCustomTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
+import edu.ucsd.cse110.habitizer.lib.domain.TimerState;
 import edu.ucsd.cse110.observables.MutableSubject;
 import edu.ucsd.cse110.observables.PlainMutableSubject;
 import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
@@ -36,7 +37,7 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Long> currentTime;
     private final MutableSubject<String> currentTimeDisplay;
     private final MutableSubject<String> completedTimeDisplay;
-    private final MutableSubject<Boolean> isTimerRunning;
+    private final MutableSubject<TimerState> timerState;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
 
@@ -53,7 +54,7 @@ public class MainViewModel extends ViewModel {
     private final Runnable updateCurrentTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
+            if (timerState.getValue() != null && timerState.getValue() == TimerState.RUNNING) {
                 currentTime.setValue(timer.getElapsedTimeInMilliseconds());
                 handler.postDelayed(this, CustomTimer.MILLISECONDS_PER_SECOND);
             }
@@ -84,7 +85,7 @@ public class MainViewModel extends ViewModel {
         this.activeRoutine = new PlainMutableSubject<>();
 
         this.completedTimeDisplay = new PlainMutableSubject<>();
-        this.isTimerRunning = new PlainMutableSubject<>();
+        this.timerState = new PlainMutableSubject<>();
         this.currentTime = new PlainMutableSubject<>();
         this.currentTimeDisplay = new PlainMutableSubject<>();
         this.onFinishedRoutine = new PlainMutableSubject<>(false);
@@ -96,7 +97,7 @@ public class MainViewModel extends ViewModel {
         this.goalTime = new PlainMutableSubject<>();
         this.goalTimeDisplay = new PlainMutableSubject<>();
         this.currentTime.setValue((long)0);
-        isTimerRunning.setValue(false);
+        timerState.setValue(TimerState.INITIAL);
         completedTimeDisplay.setValue("");
 
         // Load routines when changed and order them
@@ -223,16 +224,21 @@ public class MainViewModel extends ViewModel {
     public void startTimer() {
         timer.reset();
         timer.start();
-        isTimerRunning.setValue(true);
+        timerState.setValue(TimerState.RUNNING);
         // Start the periodic update of currentTime
         handler.post(updateCurrentTimeRunnable);
     }
 
+    public void pauseTimer() {
+        timer.pause();
+        timerState.setValue(TimerState.PAUSED);
+    }
+
     public void stopTimer() {
-        if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
+        if (timerState.getValue() != null && timerState.getValue() == TimerState.RUNNING) {
             MockCustomTimer t = (MockCustomTimer)timer;
             t.stop();
-            isTimerRunning.setValue(false);
+            timerState.setValue(TimerState.STOPPED);
             // Stop the periodic updates
             handler.removeCallbacks(updateCurrentTimeRunnable);
             String finalTime = getFormattedTime(currentTime.getValue() + 59*CustomTimer.MILLISECONDS_PER_SECOND);
@@ -242,6 +248,7 @@ public class MainViewModel extends ViewModel {
 
     public void forwardTimer() {
         MockCustomTimer mockedTimer = (MockCustomTimer)timer;
+        if (mockedTimer.getState() != TimerState.RUNNING) return;
         mockedTimer.advance();
         currentTimeDisplay.setValue(getFormattedTime(timer.getElapsedTimeInMilliseconds()));
     }
@@ -254,8 +261,8 @@ public class MainViewModel extends ViewModel {
         return currentTimeDisplay;
     }
 
-    public MutableSubject<Boolean> getIsTimerRunning() {
-        return isTimerRunning;
+    public MutableSubject<TimerState> getTimerState() {
+        return timerState;
     }
 
     public MutableSubject<String> getCompletedTimeDisplay() {

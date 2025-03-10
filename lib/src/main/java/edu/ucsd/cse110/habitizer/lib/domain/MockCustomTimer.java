@@ -12,6 +12,9 @@ public class MockCustomTimer extends CustomTimer {
     }
 
     public void advance() {
+        if (state != TimerState.RUNNING) {
+            throw new IllegalStateException();
+        }
         elapsedTimeInMilliseconds += (ADVANCE_TIME_IN_SECONDS * MILLISECONDS_PER_SECOND);
     }
 
