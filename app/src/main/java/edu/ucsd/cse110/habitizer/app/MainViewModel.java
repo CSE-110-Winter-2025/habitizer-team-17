@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
-import edu.ucsd.cse110.habitizer.lib.domain.ActiveTask;
-import edu.ucsd.cse110.habitizer.lib.domain.MockTimer;
+import edu.ucsd.cse110.habitizer.lib.domain.MockCustomTimer;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
@@ -55,7 +54,7 @@ public class MainViewModel extends ViewModel {
         @Override
         public void run() {
             if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-                currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+                currentTime.setValue(timer.getElapsedTimeInMilliseconds());
                 handler.postDelayed(this, CustomTimer.MILLISECONDS_PER_SECOND);
             }
         }
@@ -92,7 +91,7 @@ public class MainViewModel extends ViewModel {
         if(!isMocked) {
             this.timer = new CustomTimer();
         } else {
-            this.timer = new MockTimer();
+            this.timer = new MockCustomTimer();
         }
         this.goalTime = new PlainMutableSubject<>();
         this.goalTimeDisplay = new PlainMutableSubject<>();
@@ -202,7 +201,7 @@ public class MainViewModel extends ViewModel {
         if (task.isEmpty()) return;
 
         // Get current elapsed time from timer
-        long currentTime = timer.getElapsedTimeInMilliSeconds();
+        long currentTime = timer.getElapsedTimeInMilliseconds();
         long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
         activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask).withPreviousTaskEndTime(currentTime));
@@ -231,7 +230,7 @@ public class MainViewModel extends ViewModel {
 
     public void stopTimer() {
         if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-            MockTimer t = (MockTimer)timer;
+            MockCustomTimer t = (MockCustomTimer)timer;
             t.stop();
             isTimerRunning.setValue(false);
             // Stop the periodic updates
@@ -242,9 +241,9 @@ public class MainViewModel extends ViewModel {
     }
 
     public void forwardTimer() {
-        MockTimer mockedTimer = (MockTimer)timer;
-        mockedTimer.forward();
-        currentTimeDisplay.setValue(getFormattedTime(timer.getElapsedTimeInMilliSeconds()));
+        MockCustomTimer mockedTimer = (MockCustomTimer)timer;
+        mockedTimer.advance();
+        currentTimeDisplay.setValue(getFormattedTime(timer.getElapsedTimeInMilliseconds()));
     }
 
     public MutableSubject<String> getTitle() {
