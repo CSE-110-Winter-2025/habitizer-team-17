@@ -40,11 +40,10 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Boolean> isTimerRunning;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
-
     private final MutableSubject<Boolean> onFinishedRoutine;
     private boolean isAddingNewRoutine = false;
-
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
+    private final MutableSubject<String> elapsedSinceLastTaskDisplay;
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -55,10 +54,28 @@ public class MainViewModel extends ViewModel {
         public void run() {
             if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
                 currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+
+                // Update elapsed time since last task
+                if (activeRoutine.getValue() != null) {
+                    long lastTaskEndTime = activeRoutine.getValue().previousTaskEndTime();
+                    long currentElapsedSinceLastTask = timer.getElapsedTimeInMilliSeconds() - lastTaskEndTime;
+                    updateElapsedSinceLastTaskDisplay(currentElapsedSinceLastTask);
+                }
+
                 handler.postDelayed(this, CustomTimer.MILLISECONDS_PER_SECOND);
             }
         }
     };
+
+    private void updateElapsedSinceLastTaskDisplay(long milliseconds) {
+        if (milliseconds < 0) milliseconds = 0;
+
+        long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
+        long minutes = totalSeconds / 60;
+
+        // Just show the time value
+        elapsedSinceLastTaskDisplay.setValue(minutes + "m");
+    }
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
 
@@ -98,6 +115,7 @@ public class MainViewModel extends ViewModel {
         this.currentTime.setValue((long)0);
         isTimerRunning.setValue(false);
         completedTimeDisplay.setValue("");
+        this.elapsedSinceLastTaskDisplay = new PlainMutableSubject<>("");
 
         // Load routines when changed and order them
         routineRepository.findAll().observe(routines -> {
@@ -235,10 +253,17 @@ public class MainViewModel extends ViewModel {
         if (task.isEmpty()) return;
 
         // Get current elapsed time from timer
-        long currentTime = timer.getElapsedTimeInMilliSeconds();
-        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
+        long currentTimeMillis = timer.getElapsedTimeInMilliSeconds();
+        long currentElapsedTime = currentTimeMillis - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
-        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask).withPreviousTaskEndTime(currentTime));
+
+        // Update the active routine with the checked task and new end time
+        activeRoutine.setValue(activeRoutine.getValue()
+                .withActiveTask(checkedTask)
+                .withPreviousTaskEndTime(currentTimeMillis));
+
+        // Update elapsed time display immediately to show 0
+        updateElapsedSinceLastTaskDisplay(0);
     }
 
     public boolean checkIfAllCompleted(){
@@ -258,6 +283,13 @@ public class MainViewModel extends ViewModel {
         timer.reset();
         timer.start();
         isTimerRunning.setValue(true);
+
+        // When starting a new routine, set the initial previousTaskEndTime to the current time (0)
+        if (activeRoutine.getValue() != null) {
+            activeRoutine.setValue(activeRoutine.getValue().withPreviousTaskEndTime(0L));
+            updateElapsedSinceLastTaskDisplay(0);
+        }
+
         // Start the periodic update of currentTime
         handler.post(updateCurrentTimeRunnable);
     }
@@ -419,5 +451,8 @@ public class MainViewModel extends ViewModel {
         var updatedRoutine = routine.withoutTask(id);
         routineRepository.save(updatedRoutine);
 
+    }
+    public MutableSubject<String> getElapsedSinceLastTaskDisplay() {
+        return elapsedSinceLastTaskDisplay;
     }
 }
