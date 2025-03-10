@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ucsd.cse110.habitizer.app.databinding.ListItemEditTaskBinding;
+import edu.ucsd.cse110.habitizer.app.ui.editroutine.dialog.DeleteTaskDialogFragment;
 import edu.ucsd.cse110.habitizer.lib.domain.Task;
 
 public class EditRoutineAdapter extends ArrayAdapter<Task> {
@@ -59,12 +60,23 @@ public class EditRoutineAdapter extends ArrayAdapter<Task> {
             }
         });
 
+        binding.cardDeleteButton.setOnClickListener(v -> {
+            var id = getItem(position).id();
+            assert id != null;
+            showDeleteDialog(id);
+        });
+
         return binding.getRoot();
     }
 
     // The below methods aren't strictly necessary, usually.
     // But get in the habit of defining them because they never hurt
     // (as long as you have IDs for each item) and sometimes you need them.
+
+    private void showDeleteDialog(int taskId) {
+        var dialog = DeleteTaskDialogFragment.newInstance(taskId);
+        dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "EditTaskDialog");
+    }
 
     @Override
     public boolean hasStableIds() {
