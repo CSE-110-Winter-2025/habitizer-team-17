@@ -14,7 +14,7 @@
     <string name="new_task_name">New Task Name</string>
     <string name="delete">Delete</string>
     <string name="new_routine_name_text">New Routine</string>
-    <string name="add">add routine</string>
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+    <string name="add">Add Routine</string>
 </resources>

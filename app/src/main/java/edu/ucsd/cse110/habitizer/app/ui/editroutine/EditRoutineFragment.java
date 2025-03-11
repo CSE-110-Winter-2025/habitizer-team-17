@@ -42,7 +42,11 @@ public class EditRoutineFragment extends Fragment {
         this.activityModel = modelProvider.get(MainViewModel.class);
 
         // Initialize the Adapter (with an empty list for now)
-        this.adapter = new EditRoutineAdapter(requireContext(), List.of());
+        this.adapter = new EditRoutineAdapter(requireContext(), List.of(), (taskId) ->{
+            activityModel.moveTask(taskId, 1);
+        }, (taskId) -> {
+            activityModel.moveTask(taskId, 0);
+        });
 
         activityModel.getOrderedTasks().observe(tasks -> {
             if (tasks == null) return;
@@ -82,6 +86,7 @@ public class EditRoutineFragment extends Fragment {
         view.routineDeleteButton.setOnClickListener(
                 v -> activityModel.removeRoutine(activityModel.getCurrentRoutine().getValue())
         );
+
 
         return view.getRoot();
     }

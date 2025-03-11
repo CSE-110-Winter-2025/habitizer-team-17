@@ -55,6 +55,12 @@ public class Routine {
         return new Routine(id(), name(), tasks, goalTime(), sortOrder());
     }
 
+    public Routine withoutTask(int id) {
+        var newTasks = new ArrayList<>(tasks);
+        newTasks.removeIf(task -> task.id() != null && task.id() == id);
+        return withTasks(newTasks);
+    }
+
     public Routine withGoalTime(@NonNull Integer goalTime) {
         return new Routine(id(), name(), tasks(), goalTime, sortOrder());
     }
@@ -96,5 +102,31 @@ public class Routine {
             }
         }
         return withTasks(newTasks);
+    }
+
+
+    public Routine moveTaskOrdering(int taskId, int direction){ //1 is up, 0 is down
+        List<Task> newTasks = this.tasks();
+        for(var task: newTasks){
+            if(task.id() == taskId){
+                if(direction == 1){
+                    if(newTasks.indexOf(task) != 0){
+                        Task placeHolder = newTasks.get(newTasks.indexOf(task) - 1);
+                        int taskIndex = newTasks.indexOf(task);
+                        newTasks.set(taskIndex-1, task);
+                        newTasks.set(taskIndex, placeHolder);
+                        return withTasks(newTasks);
+                    }
+                } else {
+                    if(newTasks.indexOf(task) != newTasks.size() - 1){
+                        Task placeHolder = newTasks.get(newTasks.indexOf(task) + 1);
+                        newTasks.set(newTasks.indexOf(task) + 1, task);
+                        newTasks.set(newTasks.indexOf(task), placeHolder);
+                        return withTasks(newTasks);
+                    }
+                }
+            }
+        }
+        return this;
     }
 }
