@@ -25,9 +25,9 @@ import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
     private final Consumer<Integer> onCheckedClick;
-    MutableSubject<Boolean> onFinishedRoutine;
+    MutableSubject<TimerState> timerState;
 
-    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<Boolean> onFinishedRoutine) {
+    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<TimerState> timerState) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
@@ -35,7 +35,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // or it will crash!
         super(context, 0, new ArrayList<>(activeTasks));
         this.onCheckedClick = onCheckedClick;
-        this.onFinishedRoutine = onFinishedRoutine;
+        this.timerState = timerState;
     }
 
     @NonNull
@@ -58,8 +58,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
-
-
+        binding.checkTask.setChecked(task.checked());
         if (task.checked()) {
             long seconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
             long minutes = (seconds + 59)/ 60;
@@ -72,9 +71,11 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
             binding.timeText.setText("-");
         }
 
-        onFinishedRoutine.observe(finished -> {
-            if(finished == null) return;
-            if (finished) {
+        timerState.observe(state -> {
+            var thisTask = getItem(position);
+            if (thisTask == null) return;
+            if (thisTask.checked()) return;
+            if (state == TimerState.PAUSED || state == TimerState.STOPPED) {
                 binding.checkTask.setEnabled(false);
             } else {
                 binding.checkTask.setEnabled(true);
