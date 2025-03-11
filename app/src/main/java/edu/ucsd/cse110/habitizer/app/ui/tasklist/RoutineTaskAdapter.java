@@ -59,7 +59,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
-
+        String formattedTime = null;
         if (task.checked()) {
             binding.checkTask.setEnabled(false);
 
@@ -67,7 +67,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
             long totalSeconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
 
             // Format according to user stories
-            String formattedTime;
+
             if (totalSeconds < 60) {
                 // Less than a minute, show in seconds rounded to nearest 5 seconds
                 long roundedSeconds = 5 * Math.round(totalSeconds / 5.0f);
@@ -82,6 +82,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
                 long minutes = (totalSeconds + 59) / 60;
                 formattedTime = String.format("%dm", minutes);
             }
+        }
 
 
         if (task.checked()) {
