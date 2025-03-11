@@ -40,12 +40,10 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<TimerState> timerState;
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
-
     private final MutableSubject<Boolean> onFinishedRoutine;
-
-
-
+    private boolean isAddingNewRoutine = false;
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
+    private final MutableSubject<String> elapsedSinceLastTaskDisplay;
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -54,12 +52,46 @@ public class MainViewModel extends ViewModel {
     private final Runnable updateCurrentTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (timerState.getValue() != null && timerState.getValue() == TimerState.RUNNING) {
-                currentTime.setValue(timer.getElapsedTimeInMilliseconds());
+
+            if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
+                currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+
+                // Update elapsed time since last task
+                if (activeRoutine.getValue() != null) {
+                    long lastTaskEndTime = activeRoutine.getValue().previousTaskEndTime();
+                    long currentElapsedSinceLastTask = timer.getElapsedTimeInMilliSeconds() - lastTaskEndTime;
+                    updateElapsedSinceLastTaskDisplay(currentElapsedSinceLastTask);
+                }
+
                 handler.postDelayed(this, CustomTimer.MILLISECONDS_PER_SECOND);
             }
         }
     };
+
+    private void updateElapsedSinceLastTaskDisplay(long milliseconds) {
+        if (milliseconds < 0) milliseconds = 0;
+
+        long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
+
+        // Format according to requirements
+        String formattedTime;
+        if (totalSeconds < 60) {
+            // Less than a minute, show in 5-second increments
+            long roundedSeconds = 5 * Math.round(totalSeconds / 5.0f);
+            // If rounding gives us 60 seconds, show as 1m
+            if (roundedSeconds >= 60) {
+                formattedTime = "1m";
+            } else {
+                formattedTime = roundedSeconds + "s";
+            }
+        } else {
+            // 60 seconds or more, show in minutes
+            long minutes = totalSeconds / 60;
+            formattedTime = minutes + "m";
+        }
+
+        elapsedSinceLastTaskDisplay.setValue(formattedTime);
+    }
 
     private final MutableSubject<ActiveRoutine> activeRoutine;
 
@@ -99,6 +131,7 @@ public class MainViewModel extends ViewModel {
         this.currentTime.setValue((long)0);
         timerState.setValue(TimerState.INITIAL);
         completedTimeDisplay.setValue("");
+        this.elapsedSinceLastTaskDisplay = new PlainMutableSubject<>("");
 
         // Load routines when changed and order them
         routineRepository.findAll().observe(routines -> {
@@ -118,11 +151,24 @@ public class MainViewModel extends ViewModel {
                 currentRoutine.setValue(null);
                 return;
             }
+
             if (currentRoutine.getValue() == null) {
                 currentRoutine.setValue(routines.get(0));
                 return;
             }
-            // Replace current routine with routine with same id if it exists,
+
+            // If we're adding a new routine, look for the one with the highest sort order
+            if (isAddingNewRoutine) {
+                Routine highestSortOrderRoutine = routines.stream()
+                        .max(Comparator.comparingInt(Routine::sortOrder))
+                        .orElse(routines.get(0));
+
+                currentRoutine.setValue(highestSortOrderRoutine);
+                isAddingNewRoutine = false; // Reset the flag
+                return;
+            }
+
+            // Normal case: Replace current routine with routine with same id if it exists,
             // else default to the first routine.
             var routineWithSameId = routines.stream()
                     .filter(routine -> Objects.equals(routine.id(), currentRoutine.getValue().id()))
@@ -187,11 +233,32 @@ public class MainViewModel extends ViewModel {
     public void nextRoutine() {
         if (orderedRoutines.getValue() == null) return;
         if (currentRoutine.getValue() == null) return;
+        if (orderedRoutines.getValue().isEmpty()) return;
 
-        var currentSortOrder = currentRoutine.getValue().sortOrder();
-        var nextSortOrder = (currentSortOrder + 1) % orderedRoutines.getValue().size();
+        // Find the current routine's position in the ordered list
+        List<Routine> routines = orderedRoutines.getValue();
+        int currentIndex = -1;
 
-        currentRoutine.setValue(orderedRoutines.getValue().get(nextSortOrder));
+        for (int i = 0; i < routines.size(); i++) {
+            if (Objects.equals(routines.get(i).id(), currentRoutine.getValue().id())) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        // If not found for some reason, default to first routine
+        if (currentIndex == -1) {
+            currentRoutine.setValue(routines.get(0));
+            return;
+        }
+
+        // Move to next routine
+        int nextIndex = (currentIndex + 1) % routines.size();
+        currentRoutine.setValue(routines.get(nextIndex));
+    }
+
+    public void navigateToNewlyCreatedRoutine(Routine newRoutine) {
+        currentRoutine.setValue(newRoutine);
     }
 
     public void checkTask(Integer id) {
@@ -206,10 +273,17 @@ public class MainViewModel extends ViewModel {
         if (task.isEmpty()) return;
 
         // Get current elapsed time from timer
-        long currentTime = timer.getElapsedTimeInMilliseconds();
-        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
+        long currentTimeMillis = timer.getElapsedTimeInMilliSeconds();
+        long currentElapsedTime = currentTimeMillis - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
-        activeRoutine.setValue(activeRoutine.getValue().withActiveTask(checkedTask).withPreviousTaskEndTime(currentTime));
+
+        // Update the active routine with the checked task and new end time
+        activeRoutine.setValue(activeRoutine.getValue()
+                .withActiveTask(checkedTask)
+                .withPreviousTaskEndTime(currentTimeMillis));
+
+        // Update elapsed time display immediately to show 0
+        updateElapsedSinceLastTaskDisplay(0);
     }
 
     public boolean checkIfAllCompleted(){
@@ -229,6 +303,14 @@ public class MainViewModel extends ViewModel {
         timer.reset();
         timer.start();
         timerState.setValue(TimerState.RUNNING);
+        isTimerRunning.setValue(true);
+
+        // When starting a new routine, set the initial previousTaskEndTime to the current time (0)
+        if (activeRoutine.getValue() != null) {
+            activeRoutine.setValue(activeRoutine.getValue().withPreviousTaskEndTime(0L));
+            updateElapsedSinceLastTaskDisplay(0);
+        }
+
         // Start the periodic update of currentTime
         handler.post(updateCurrentTimeRunnable);
     }
@@ -341,6 +423,22 @@ public class MainViewModel extends ViewModel {
                 : String.format("%dm/", minutes);
     }
 
+    public String formatElapsedTime(long milliseconds) {
+        if (milliseconds < 0) milliseconds = 0;
+
+        long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
+
+        // If less than a minute, show in seconds
+        if (totalSeconds < 60) {
+            return totalSeconds + "s";
+        } else {
+            // Otherwise show in minutes (ceiling to next minute if not exact)
+            long minutes = (totalSeconds + 59) / 60;  // Ceiling division
+            return minutes + "m";
+        }
+    }
+
+
 
     public void endRoutine(){
         stopTimer();
@@ -373,9 +471,20 @@ public class MainViewModel extends ViewModel {
         if (orderedRoutines.getValue() == null) return;
 
         List<Routine> routines = orderedRoutines.getValue();
-        int sortOrder = routines.isEmpty() ? 0 : routines.get(routines.size() - 1).sortOrder();
+        int maxSortOrder = 0;
 
-        Routine newRoutine = new Routine(sortOrder + 1, routineName, new ArrayList<>(), 0, sortOrder + 1);
+        // Find the maximum sort order
+        for (Routine r : routines) {
+            if (r.sortOrder() > maxSortOrder) {
+                maxSortOrder = r.sortOrder();
+            }
+        }
+
+        // Set flag to indicate we're adding a new routine
+        isAddingNewRoutine = true;
+
+        // Create with sort order one higher than the max
+        Routine newRoutine = new Routine(null, routineName, new ArrayList<>(), 0, maxSortOrder + 1);
         routineRepository.save(newRoutine);
     }
 
@@ -391,5 +500,8 @@ public class MainViewModel extends ViewModel {
         var updatedRoutine = routine.withoutTask(id);
         routineRepository.save(updatedRoutine);
 
+    }
+    public MutableSubject<String> getElapsedSinceLastTaskDisplay() {
+        return elapsedSinceLastTaskDisplay;
     }
 }

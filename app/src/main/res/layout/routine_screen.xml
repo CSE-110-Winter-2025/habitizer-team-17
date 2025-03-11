@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@string/_45m"
-        android:textSize="24sp"
+        android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/activeList"
         app:layout_constraintEnd_toStartOf="@+id/fast_forward_button"
         app:layout_constraintTop_toTopOf="parent" />
@@ -69,11 +69,32 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="@string/_45m"
-        android:textSize="24sp"
+        android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/activeList"
         app:layout_constraintEnd_toStartOf="@+id/goal_time_display"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/elapsed_since_last_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="0m"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toStartOf="@+id/timer_display"
+        app:layout_constraintTop_toTopOf="@+id/timer_display" />
+
+    <!-- Label for elapsed time -->
+    <TextView
+        android:id="@+id/elapsed_time_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/elapsed_since_last_task"
+        app:layout_constraintStart_toStartOf="@+id/elapsed_since_last_task"
+        app:layout_constraintEnd_toEndOf="@+id/elapsed_since_last_task" />
+    >
     <ListView
         android:id="@+id/activeList"
         android:layout_width="0dp"

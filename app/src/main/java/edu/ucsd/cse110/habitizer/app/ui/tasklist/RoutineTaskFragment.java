@@ -112,6 +112,12 @@ public class RoutineTaskFragment extends Fragment {
                     view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
                 }
         });
+
+        activityModel.getElapsedSinceLastTaskDisplay().observe(elapsedTime -> {
+            if (elapsedTime == null) return;
+            view.elapsedSinceLastTask.setText(elapsedTime);
+        });
+
         // Button click listeners
         view.endRoutineButton.setOnClickListener(v -> {
             activityModel.endRoutine();
