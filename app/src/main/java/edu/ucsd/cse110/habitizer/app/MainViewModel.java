@@ -45,20 +45,19 @@ public class MainViewModel extends ViewModel {
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
     private final MutableSubject<String> elapsedSinceLastTaskDisplay;
 
-    // TODO: CITE
     // Handler for updating the current time on the main thread
     private final Handler handler = new Handler(Looper.getMainLooper());
     // Runnable that updates currentTime every second
     private final Runnable updateCurrentTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-                currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+            if (timerState.getValue() != null && timerState.getValue() == TimerState.RUNNING) {
+                currentTime.setValue(timer.getElapsedTimeInMilliseconds());
 
                 // Update elapsed time since last task
                 if (activeRoutine.getValue() != null) {
                     long lastTaskEndTime = activeRoutine.getValue().previousTaskEndTime();
-                    long currentElapsedSinceLastTask = timer.getElapsedTimeInMilliSeconds() - lastTaskEndTime;
+                    long currentElapsedSinceLastTask = timer.getElapsedTimeInMilliseconds() - lastTaskEndTime;
                     updateElapsedSinceLastTaskDisplay(currentElapsedSinceLastTask);
                 }
 
@@ -273,8 +272,8 @@ public class MainViewModel extends ViewModel {
 
         // Get current elapsed time from timer
         long currentTime = timer.getElapsedTimeInMilliseconds();
-        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
-        long currentTimeMillis = timer.getElapsedTimeInMilliSeconds();
+        // long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
+        long currentTimeMillis = timer.getElapsedTimeInMilliseconds();
         long currentElapsedTime = currentTimeMillis - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
 
@@ -305,7 +304,6 @@ public class MainViewModel extends ViewModel {
         timer.start();
         timerState.setValue(TimerState.RUNNING);
 
-        isTimerRunning.setValue(true);
 
         // When starting a new routine, set the initial previousTaskEndTime to the current time (0)
         if (activeRoutine.getValue() != null) {
