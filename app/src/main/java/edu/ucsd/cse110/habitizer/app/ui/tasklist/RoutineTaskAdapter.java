@@ -56,15 +56,29 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         binding.checkTask.setChecked(task.checked());
 
         if (task.checked()) {
+            binding.checkTask.setEnabled(false);
 
+            // Get the elapsed time in seconds
+            long totalSeconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
 
-            long seconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
-            long minutes = (seconds + 59)/ 60;
+            // Format according to user stories
+            String formattedTime;
+            if (totalSeconds < 60) {
+                // Less than a minute, show in seconds rounded to nearest 5 seconds
+                long roundedSeconds = 5 * Math.round(totalSeconds / 5.0f);
+                // Special handling for 55-60 seconds (show as 1m)
+                if (roundedSeconds >= 60) {
+                    formattedTime = "1m";
+                } else {
+                    formattedTime = String.format("%ds", roundedSeconds);
+                }
+            } else {
+                // 60 seconds or more, round up to the next minute
+                long minutes = (totalSeconds + 59) / 60;
+                formattedTime = String.format("%dm", minutes);
+            }
 
-            minutes = Math.max(1, minutes);
-
-            binding.timeText.setText(String.format("%dm", minutes));
-
+            binding.timeText.setText(formattedTime);
         } else {
             binding.timeText.setText("-");
         }
