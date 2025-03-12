@@ -59,16 +59,15 @@ public class AsyncRoutineTimerTest {
         fakeRepo.save(routine);
         viewModel.startRoutine(routine);
 
-        assertEquals("0s/", viewModel.getCurrentTimeDisplay().getValue());
+        assertEquals("0s/", viewModel.getElapsedSinceLastTaskDisplay().getValue());
         viewModel.forwardTimer();
         viewModel.forwardTimer();
-        assertEquals("30s/", viewModel.getCurrentTimeDisplay().getValue());
+        assertEquals("30s/", viewModel.getElapsedSinceLastTaskDisplay().getValue());
         viewModel.forwardTimer();
         viewModel.forwardTimer();
-        assertEquals("1m/", viewModel.getCurrentTimeDisplay().getValue());
-        viewModel.forwardTimer();
-        viewModel.endRoutine();
-        assertEquals("2m/", viewModel.getCurrentTimeDisplay().getValue());
+        assertEquals("1m/", viewModel.getElapsedSinceLastTaskDisplay().getValue());
+        viewModel.checkTask(0);
+        assertEquals("0s/", viewModel.getElapsedSinceLastTaskDisplay().getValue());
 
     }
 }
