@@ -4,67 +4,82 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class CustomTimer {
-    protected Timer timer;
-    protected long elapsedTimeMilliSeconds;
-    protected boolean isRunning;
     public static final int MILLISECONDS_PER_SECOND = 1000;
-    protected TimerTask timerTask;
+    protected TimerState state;
+    protected Timer timer;
+    protected long elapsedTimeInMilliseconds;
 
 
     public CustomTimer() {
-        this.elapsedTimeMilliSeconds = 0;
-        this.isRunning = false;
+        reset();
     }
 
-    private void startTimer() {
-        if (timer != null) {
-            timer.cancel();
-            timer.purge();
+    public CustomTimer(TimerState state, long elapsedTimeInMilliseconds) {
+        this.timer = null;
+        this.state = state;
+        this.elapsedTimeInMilliseconds = elapsedTimeInMilliseconds;
+        if (state == TimerState.RUNNING) {
+            runTimer();
         }
+    }
+
+    private void runTimer() {
         timer = new Timer();
-        timerTask = new TimerTask() {
+        TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                elapsedTimeMilliSeconds += MILLISECONDS_PER_SECOND;
+                elapsedTimeInMilliseconds += MILLISECONDS_PER_SECOND;
             }
         };
-        timer.schedule(timerTask, MILLISECONDS_PER_SECOND, MILLISECONDS_PER_SECOND); // Schedule with a delay of 1s, then repeat every 1s
+        // Run every second, starting after 1 second
+        timer.schedule(timerTask, MILLISECONDS_PER_SECOND, MILLISECONDS_PER_SECOND);
     }
 
     public void start() {
-        if (!isRunning) {
-            startTimer(); // Start from the current elapsed time
-            isRunning = true;
+        if (state != TimerState.INITIAL) {
+            throw new IllegalStateException();
         }
+        runTimer();
+        state = TimerState.RUNNING;
     }
 
-    public boolean isRunning() {
-        return isRunning;
+    public void pause() {
+        if (state != TimerState.RUNNING) {
+            throw new IllegalStateException();
+        }
+        timer.cancel();
+        state = TimerState.PAUSED;
     }
 
-
-    public long getElapsedTimeInMilliSeconds(){
-        return elapsedTimeMilliSeconds;
+    public void resume() {
+        if (state != TimerState.PAUSED) {
+            throw new IllegalStateException();
+        }
+        runTimer();
+        state = TimerState.RUNNING;
     }
 
     public void stop() {
-        if (isRunning) {
-            if (timer != null) {
-                timer.cancel();
-                timer.purge();
-                timer = null;
-            }
-            isRunning = false;
+        if (state != TimerState.RUNNING && state != TimerState.PAUSED) {
+            throw new IllegalStateException();
         }
+        timer.cancel();
+        state = TimerState.STOPPED;
     }
 
     public void reset() {
         if (timer != null) {
             timer.cancel();
-            timer.purge();
-            timer = null;
         }
-        elapsedTimeMilliSeconds = 0;
-        isRunning = false;
+        state = TimerState.INITIAL;
+        elapsedTimeInMilliseconds = 0;
+    }
+
+    public TimerState getState() {
+        return state;
+    }
+
+    public long getElapsedTimeInMilliseconds() {
+        return elapsedTimeInMilliseconds;
     }
 }

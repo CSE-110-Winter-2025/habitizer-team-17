@@ -8,12 +8,13 @@
     <string name="next">Next</string>
     <string name="set_time">Set Time</string>
     <string name="fast_forward">Fast Forward</string>
-    <string name="stop">Stop</string>
     <string name="end_edit">End Edit</string>
     <string name="add_task">Add Task</string>
     <string name="edit">Edit</string>
     <string name="new_task_name">New Task Name</string>
     <string name="delete">Delete</string>
     <string name="new_routine_name_text">New Routine</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
     <string name="add">Add Routine</string>
 </resources>
