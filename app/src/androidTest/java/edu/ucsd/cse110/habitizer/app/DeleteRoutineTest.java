@@ -27,7 +27,7 @@ public class DeleteRoutineTest {
         public FakeRoutineRepository() {
             List<Routine> newList = new ArrayList<>();
             newList.add(new Routine(1, "test 1", new ArrayList<>(), 0, 0));
-            newList.add(new Routine(2, "test 2", new ArrayList<>(), 0, 0));
+            newList.add(new Routine(2, "test 2", new ArrayList<>(), 0, 1));
             routines.setValue(newList);
         }
 
@@ -108,8 +108,8 @@ public class DeleteRoutineTest {
         assertEquals("test 2", routines.get(0).name());
 
         viewModel.removeRoutine(viewModel.getCurrentRoutine().getValue());
-        viewModel.addRoutineToEnd("test 3");
-        viewModel.addRoutineToEnd("test 4");
+        fakeRepo.save(new Routine(3, "test 3", List.of(), 0, 2));
+        fakeRepo.save(new Routine(4, "test 4", List.of(), 0, 3));
         viewModel.removeRoutine(viewModel.getCurrentRoutine().getValue());
         routines = fakeRepo.findAll().getValue();
         assertEquals(1, routines.size());

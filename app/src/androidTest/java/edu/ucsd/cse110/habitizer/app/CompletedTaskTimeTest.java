@@ -9,6 +9,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutine;
+import edu.ucsd.cse110.habitizer.lib.domain.ActiveRoutineRepository;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
+import edu.ucsd.cse110.habitizer.lib.domain.CustomTimerRepository;
 import edu.ucsd.cse110.habitizer.lib.domain.Routine;
 import edu.ucsd.cse110.habitizer.lib.domain.RoutineRepository;
 import edu.ucsd.cse110.observables.MutableSubject;
@@ -44,10 +48,48 @@ public class CompletedTaskTimeTest {
         }
     }
 
+    private static class FakeActiveRoutineRepository implements ActiveRoutineRepository {
+
+        @Override
+        public MutableSubject<ActiveRoutine> find() {
+            return new PlainMutableSubject<>();
+        }
+
+        @Override
+        public void save(ActiveRoutine activeRoutine) {
+
+        }
+
+        @Override
+        public void delete() {
+
+        }
+    }
+
+    private static class FakeCustomTimerRepository implements CustomTimerRepository {
+
+        @Override
+        public MutableSubject<CustomTimer> find() {
+            return new PlainMutableSubject<>();
+        }
+
+        @Override
+        public void save(CustomTimer customTimer) {
+
+        }
+
+        @Override
+        public void delete() {
+
+        }
+    }
+
     @Before
     public void setUp() {
         fakeRepo = new FakeRoutineRepository();
-        viewModel = new MainViewModel(fakeRepo);
+        var fakeRepo2 = new FakeActiveRoutineRepository();
+        var fakeRepo3 = new FakeCustomTimerRepository();
+        viewModel = new MainViewModel(fakeRepo, fakeRepo2, fakeRepo3);
     }
 
     private String getFormattedElapsedTime(long milliseconds) throws Exception {

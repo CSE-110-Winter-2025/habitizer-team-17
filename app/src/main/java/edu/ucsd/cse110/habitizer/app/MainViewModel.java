@@ -580,4 +580,8 @@ public class MainViewModel extends ViewModel {
     public MutableSubject<String> getElapsedSinceLastTaskDisplay() {
         return elapsedSinceLastTaskDisplay;
     }
+
+    public MutableSubject<CustomTimer> getTimer() {
+        return timer;
+    }
 }
