@@ -322,7 +322,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void forwardTimer() {
-        MockTimer mockedTimer = (MockTimer)timer;
+        CustomMockTimer mockedTimer = (MockTimer)timer;
         mockedTimer.forward();
         currentTimeDisplay.setValue(getFormattedTime(timer.getElapsedTimeInMilliSeconds()));
     }
@@ -418,7 +418,21 @@ public class MainViewModel extends ViewModel {
         }
     }
 
+    public void startRoutine(){
+        startTimer();
 
+        List<ActiveTask> activeTasks = new ArrayList<>();
+        var routine = getCurrentRoutine().getValue();
+        if (routine == null) return;
+        for (var task : routine.tasks()) {
+            ActiveTask newActiveTask = new ActiveTask(task, false, 0);
+            activeTasks.add(newActiveTask);
+        }
+
+        getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks,0L));
+
+        getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+    }
 
     public void endRoutine(){
 

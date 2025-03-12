@@ -71,20 +71,7 @@ public class TaskListFragment extends Fragment {
         view.nextButton.setOnClickListener(v -> activityModel.nextRoutine());
 
         view.startButton.setOnClickListener(v -> {
-            activityModel.startTimer();
-
-            List<ActiveTask> activeTasks = new ArrayList<>();
-            var routine = activityModel.getCurrentRoutine().getValue();
-            if (routine == null) return;
-            for (var task : routine.tasks()) {
-                ActiveTask newActiveTask = new ActiveTask(task, false, 0);
-                activeTasks.add(newActiveTask);
-            }
-
-            activityModel.getActiveRoutine().setValue(new ActiveRoutine(routine, activeTasks,0L));
-
-            activityModel.getScreen().setValue(Screen.ACTIVE_ROUTINE_SCREEN);
-
+            activityModel.startRoutine();
         });
 
         view.editButton.setOnClickListener(
