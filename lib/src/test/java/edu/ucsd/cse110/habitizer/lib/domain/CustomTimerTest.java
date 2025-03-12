@@ -1,51 +1,91 @@
 package edu.ucsd.cse110.habitizer.lib.domain;
+
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class CustomTimerTest {
-    private CustomTimer timer;
-
-    @Before
-    public void setUp() {
-        timer = new MockTimer();
-    }
 
     @Test
     public void testStartTimer() throws InterruptedException {
-        timer.start();
-        Thread.sleep(2050); // Wait for 2 seconds
-        timer.stop();
+        CustomTimer timer = new CustomTimer();
 
-        long elapsedTime = timer.getElapsedTimeInMilliSeconds(); // Store as a String
-        assertNotEquals(0, elapsedTime/CustomTimer.MILLISECONDS_PER_SECOND); // Timer should not be at "00:00"
+        timer.start();
+        Thread.sleep(1050); // Wait for 1 second
+
+        TimerState state = timer.getState();
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
+
+        assertEquals(TimerState.RUNNING, state);
+        assertEquals(1000, elapsedTimeInMilliseconds);
     }
 
+    @Test
+    public void testPauseTimer() throws InterruptedException {
+        CustomTimer timer = new CustomTimer(TimerState.RUNNING, 1000);
+
+        timer.pause();
+        Thread.sleep(1050); // Wait for 1 second
+
+        TimerState state = timer.getState();
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
+
+        assertEquals(TimerState.PAUSED, state);
+        assertEquals(1000, elapsedTimeInMilliseconds);
+    }
+
+    @Test
+    public void testResumeTimer() throws InterruptedException {
+        CustomTimer timer = new CustomTimer(TimerState.PAUSED, 1000);
+
+        timer.resume();
+        Thread.sleep(1050); // Wait for 1 second
+
+        TimerState state = timer.getState();
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
+
+        assertEquals(TimerState.RUNNING, state);
+        assertEquals(2000, elapsedTimeInMilliseconds);
+    }
 
     @Test
     public void testStopTimer() throws InterruptedException {
-        timer.start();
-        Thread.sleep(2050); // Wait for 2 seconds
+        CustomTimer timer = new CustomTimer(TimerState.RUNNING, 1000);
+
         timer.stop();
+        Thread.sleep(1050); // Wait for 1 second
 
-        // Ensure time is stored correctly
-        assertNotEquals(0, timer.getElapsedTimeInMilliSeconds());
+        TimerState state = timer.getState();
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
 
-        // Ensure stopping the timer prevents further increments
-        Thread.sleep(2000);
-        assertEquals(2000, timer.getElapsedTimeInMilliSeconds());
+        assertEquals(TimerState.STOPPED, state);
+        assertEquals(1000, elapsedTimeInMilliseconds);
     }
 
     @Test
-    public void testFastForward() {
-        // Enable mock mode
-        MockTimer t = (MockTimer)timer;
-        t.forward();
-        t.forward();
+    public void testResetTimer() throws InterruptedException {
+        CustomTimer timer = new CustomTimer(TimerState.STOPPED, 1000);
 
-        // Timer should advance by 30 seconds
-        assertEquals(60*CustomTimer.MILLISECONDS_PER_SECOND, t.getElapsedTimeInMilliSeconds());
+        timer.reset();
+        Thread.sleep(1050); // Wait for 1 second
+
+        TimerState state = timer.getState();
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
+
+        assertEquals(TimerState.INITIAL, state);
+        assertEquals(0, elapsedTimeInMilliseconds);
+    }
+
+    @Test
+    public void testAdvanceTimer() {
+        MockCustomTimer timer = new MockCustomTimer(TimerState.RUNNING, 0);
+
+        timer.advance();
+
+        long elapsedTimeInMilliseconds = timer.getElapsedTimeInMilliseconds();
+
+        assertEquals(MockCustomTimer.ADVANCE_TIME_IN_SECONDS * CustomTimer.MILLISECONDS_PER_SECOND, elapsedTimeInMilliseconds);
     }
 
 }
