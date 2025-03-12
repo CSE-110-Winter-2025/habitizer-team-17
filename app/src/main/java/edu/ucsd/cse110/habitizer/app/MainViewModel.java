@@ -60,13 +60,13 @@ public class MainViewModel extends ViewModel {
         public void run() {
             if (timer.getValue() == null || timerState.getValue() == null) return;
 
-            if (isTimerRunning.getValue() != null && isTimerRunning.getValue()) {
-                currentTime.setValue(timer.getElapsedTimeInMilliSeconds());
+            if (timerState.getValue() != null && timerState.getValue() == TimerState.RUNNING) {
+                currentTime.setValue(timer.getValue().getElapsedTimeInMilliseconds());
 
                 // Update elapsed time since last task
                 if (activeRoutine.getValue() != null) {
                     long lastTaskEndTime = activeRoutine.getValue().previousTaskEndTime();
-                    long currentElapsedSinceLastTask = timer.getElapsedTimeInMilliSeconds() - lastTaskEndTime;
+                    long currentElapsedSinceLastTask = timer.getValue().getElapsedTimeInMilliseconds() - lastTaskEndTime;
                     updateElapsedSinceLastTaskDisplay(currentElapsedSinceLastTask);
                 }
 
@@ -324,14 +324,13 @@ public class MainViewModel extends ViewModel {
 
         // Get current elapsed time from timer
         long currentTime = timer.getValue().getElapsedTimeInMilliseconds();
-        long currentTimeMillis = timer.getElapsedTimeInMilliSeconds();
-        long currentElapsedTime = currentTimeMillis - activeRoutine.getValue().previousTaskEndTime();
+        long currentElapsedTime = currentTime - activeRoutine.getValue().previousTaskEndTime();
         var checkedTask = task.get().withChecked(true, currentElapsedTime);
 
         // Update the active routine with the checked task and new end time
         activeRoutine.setValue(activeRoutine.getValue()
                 .withActiveTask(checkedTask)
-                .withPreviousTaskEndTime(currentTimeMillis));
+                .withPreviousTaskEndTime(currentTime));
 
         // Update elapsed time display immediately to show 0
         updateElapsedSinceLastTaskDisplay(0);
@@ -455,7 +454,7 @@ public class MainViewModel extends ViewModel {
         System.out.println("Task added: " + taskName + " to routine: " + newRoutine.name());
     }
 
-    public boolean isMocked() {
+    public boolean isMocked(){
         return isMocked;
     }
 
@@ -552,9 +551,8 @@ public class MainViewModel extends ViewModel {
         // Set flag to indicate we're adding a new routine
         isAddingNewRoutine = true;
 
-
-        Routine newRoutine = new Routine(sortOrder + 1, routineName, new ArrayList<>(), 0,
-                sortOrder + 1);
+        // Create with sort order one higher than the max
+        Routine newRoutine = new Routine(null, routineName, new ArrayList<>(), 0, maxSortOrder + 1);
         routineRepository.save(newRoutine);
     }
 

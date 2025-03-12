@@ -6,13 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import android.util.Log;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
@@ -59,10 +57,8 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
         binding.checkTask.setChecked(task.checked());
-        if (task.checked()) {
-            long seconds = task.checkedElapsedTime() / CustomTimer.MILLISECONDS_PER_SECOND;
-            long minutes = (seconds + 59)/ 60;
 
+        if (task.checked()) {
             binding.checkTask.setEnabled(false);
 
             // Get the elapsed time in seconds
@@ -101,14 +97,17 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
             }
         });
 
+
         if (task.checked()){
             binding.checkTask.setEnabled(false);
         }
+
 
         binding.checkTask.setOnClickListener(view -> {
             var id = task.task().id();
             assert id != null;
             onCheckedClick.accept(id);
+
         });
         return binding.getRoot();
     }
