@@ -228,6 +228,22 @@ public class MainViewModel extends ViewModel {
         currentRoutine.setValue(orderedRoutines.getValue().get(nextSortOrder));
     }
 
+    public void startRoutine() {
+        startTimer();
+
+        List<ActiveTask> activeTasks = new ArrayList<>();
+        var routine = currentRoutine.getValue();
+        if (routine == null) return;
+        for (var task : routine.tasks()) {
+            ActiveTask newActiveTask = new ActiveTask(task, false, 0);
+            activeTasks.add(newActiveTask);
+        }
+
+        activeRoutine.setValue(new ActiveRoutine(routine, activeTasks,0L));
+
+        screen.setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+    }
+
     public void checkTask(Integer id) {
         if (timer.getValue() == null) return;
         if (activeRoutine.getValue() == null) return;
