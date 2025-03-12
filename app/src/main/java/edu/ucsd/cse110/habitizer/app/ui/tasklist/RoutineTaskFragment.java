@@ -51,10 +51,10 @@ public class RoutineTaskFragment extends Fragment {
 
         this.adapter = new RoutineTaskAdapter(requireContext(), List.of(), (id) -> {
             activityModel.checkTask(id);
-            if (activityModel.checkIfAllCompleted()){
+            if (activityModel.checkIfAllCompleted()) {
                 activityModel.endRoutine();
             }
-        }, activityModel.getOnFinishedRoutine());
+        }, activityModel.getTimerState());
 
         activityModel.getActiveRoutine().observe(routine -> {
             if (routine == null) return;
@@ -76,41 +76,56 @@ public class RoutineTaskFragment extends Fragment {
             view.routineTitle.setText(activeRoutine.routine().name());
         });
 
-        activityModel.getGoalTimeDisplay().observe(
-                goalTimeDisplay -> view.goalTimeDisplay.setText(goalTimeDisplay)
-        );
+        activityModel.getActiveRoutine().observe(activeRoutine -> {
+            if (activeRoutine == null) return;
+            view.goalTimeDisplay.setText(activeRoutine.routine().goalTime() + "m");
+        });
 
         activityModel.getTimerState().observe(timerState -> {
             if (timerState == null) return;
-            view.pauseButton.setEnabled(timerState == TimerState.RUNNING);
-            view.fastForwardButton.setEnabled(timerState == TimerState.RUNNING);
+            if (timerState == TimerState.RUNNING) {
+                view.backButton.setVisibility(View.GONE);
+                view.pauseButton.setVisibility(View.VISIBLE);
+                view.pauseButton.setEnabled(true);
+                view.resumeButton.setVisibility(View.GONE);
+                view.fastForwardButton.setEnabled(true);
+                view.endRoutineButton.setEnabled(true);
+            } else if (timerState == TimerState.PAUSED) {
+                view.backButton.setVisibility(View.GONE);
+                view.pauseButton.setVisibility(View.GONE);
+                view.resumeButton.setVisibility(View.VISIBLE);
+                view.fastForwardButton.setEnabled(false);
+                view.endRoutineButton.setEnabled(false);
+            }
         });
 
         activityModel.getOnFinishedRoutine().observe(finished -> {
             if (finished == null) return;
-            if(finished) {
+            if (finished) {
+                view.pauseButton.setVisibility(View.VISIBLE);
                 view.pauseButton.setEnabled(false);
+                view.resumeButton.setVisibility(View.GONE);
                 view.endRoutineButton.setEnabled(false);
+                view.fastForwardButton.setEnabled(false);
                 view.backButton.setVisibility(View.VISIBLE);
             }
         });
 
-        view.backButton.setVisibility(View.GONE);
         view.backButton.setOnClickListener(v -> {
             activityModel.getScreen().setValue(Screen.PREVIEW_SCREEN);
             activityModel.resetRoutine();
         });
 
         activityModel.getCurrentTimeDisplay().observe(o -> {
-            if(activityModel.getTimerState().getValue() != TimerState.STOPPED) {
+            if (activityModel.getTimerState().getValue() != TimerState.STOPPED) {
                 view.timerDisplay.setText(activityModel.getCurrentTimeDisplay().getValue());
             }
         });
 
         activityModel.getCompletedTimeDisplay().observe(o -> {
-                if(activityModel.getTimerState().getValue() == TimerState.STOPPED) {
-                    view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
-                }
+            if (activityModel.getTimerState().getValue() == TimerState.STOPPED) {
+                view.timerDisplay.setText(activityModel.getCompletedTimeDisplay().getValue());
+            }
         });
 
         activityModel.getElapsedSinceLastTaskDisplay().observe(elapsedTime -> {
@@ -123,25 +138,21 @@ public class RoutineTaskFragment extends Fragment {
             activityModel.endRoutine();
         });
 
-        if(activityModel.isMocked()) {
+        if (activityModel.isMocked()) {
             view.fastForwardButton.setOnClickListener(v -> activityModel.forwardTimer());
         } else {
             view.fastForwardButton.setVisibility(View.GONE);
         }
 
-        view.resumeButton.setVisibility(View.GONE);
-        view.pauseButton.setOnClickListener(v ->
-                {
-                    activityModel.pauseTimer();
-                    view.resumeButton.setVisibility(View.VISIBLE);
-                }
-        );
+        view.pauseButton.setOnClickListener(v -> {
+            if (activityModel.getTimerState().getValue() == TimerState.RUNNING) {
+                activityModel.pauseTimer();
+            }
+        });
 
         view.resumeButton.setOnClickListener(v -> {
             if (activityModel.getTimerState().getValue() == TimerState.PAUSED) {
                 activityModel.resumeTimer();
-                view.resumeButton.setVisibility(View.GONE);
-                view.pauseButton.setVisibility(View.VISIBLE);
             }
         });
 

@@ -70,9 +70,7 @@ public class TaskListFragment extends Fragment {
 
         view.nextButton.setOnClickListener(v -> activityModel.nextRoutine());
 
-        view.startButton.setOnClickListener(v -> {
-            activityModel.startRoutine();
-        });
+        view.startButton.setOnClickListener(v -> activityModel.startRoutine());
 
         view.editButton.setOnClickListener(
                 v -> activityModel.getScreen().setValue(Screen.EDIT_ROUTINE_SCREEN)
