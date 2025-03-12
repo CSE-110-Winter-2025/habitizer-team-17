@@ -46,10 +46,12 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Integer> goalTime;
     private final MutableSubject<String> goalTimeDisplay;
     private final MutableSubject<Boolean> onFinishedRoutine;
+
+    private final MutableSubject<String> elapsedSinceLastTaskDisplay;
     private boolean isAddingNewRoutine = false;
 
     private final boolean isMocked = true; //CHANGE THIS IF YOU WANT IT TO BE MOCKED/ NOT MOCKED
-    private final MutableSubject<String> elapsedSinceLastTaskDisplay;
+
 
     // TODO: CITE
     // Handler for updating the current time on the main thread
@@ -150,7 +152,10 @@ public class MainViewModel extends ViewModel {
         activeRoutineRepository.find().observe(storedActiveRoutine -> {
                     if (storedActiveRoutine == null) return;
                     activeRoutine.setValue(storedActiveRoutine);
-                    screen.setValue(Screen.ACTIVE_ROUTINE_SCREEN);
+                    if (timer.getValue() != null)
+                        updateElapsedSinceLastTaskDisplay(timer.getValue().getElapsedTimeInMilliseconds() - storedActiveRoutine.previousTaskEndTime());
+
+            screen.setValue(Screen.ACTIVE_ROUTINE_SCREEN);
                 }
         );
 
@@ -165,6 +170,9 @@ public class MainViewModel extends ViewModel {
             timer.setValue(customTimer);
             timerState.setValue(customTimer.getState());
             currentTime.setValue(customTimer.getElapsedTimeInMilliseconds());
+            if (activeRoutine.getValue() != null)
+                updateElapsedSinceLastTaskDisplay(customTimer.getElapsedTimeInMilliseconds() - activeRoutine.getValue().previousTaskEndTime());
+
             if (customTimer.getState() == TimerState.STOPPED) {
                 String finalTime =
                         getFormattedTime(customTimer.getElapsedTimeInMilliseconds() + 59 * CustomTimer.MILLISECONDS_PER_SECOND);
