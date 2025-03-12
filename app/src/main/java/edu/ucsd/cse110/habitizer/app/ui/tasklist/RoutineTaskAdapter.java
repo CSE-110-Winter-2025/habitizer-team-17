@@ -6,13 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import android.util.Log;
 
 import edu.ucsd.cse110.habitizer.app.MainViewModel;
 import edu.ucsd.cse110.habitizer.app.databinding.RoutineTaskBinding;
@@ -25,9 +23,9 @@ import edu.ucsd.cse110.habitizer.lib.domain.CustomTimer;
 public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
     private final Consumer<Integer> onCheckedClick;
-    MutableSubject<Boolean> onFinishedRoutine;
+    MutableSubject<TimerState> timerState;
 
-    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<Boolean> onFinishedRoutine) {
+    public RoutineTaskAdapter(Context context, List<ActiveTask> activeTasks, Consumer<Integer> onCheckedClick, MutableSubject<TimerState> timerState) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
@@ -35,7 +33,7 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
         // or it will crash!
         super(context, 0, new ArrayList<>(activeTasks));
         this.onCheckedClick = onCheckedClick;
-        this.onFinishedRoutine = onFinishedRoutine;
+        this.timerState = timerState;
     }
 
     @NonNull
@@ -58,7 +56,6 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
 
         // Populate the view with the task
         binding.checkTask.setText(task.task().name());
-
         binding.checkTask.setChecked(task.checked());
 
         if (task.checked()) {
@@ -89,23 +86,28 @@ public class RoutineTaskAdapter extends ArrayAdapter<ActiveTask> {
             binding.timeText.setText("-");
         }
 
-        onFinishedRoutine.observe(finished -> {
-            if(finished == null) return;
-            if (finished) {
+        timerState.observe(state -> {
+            var thisTask = getItem(position);
+            if (thisTask == null) return;
+            if (thisTask.checked()) return;
+            if (state == TimerState.PAUSED || state == TimerState.STOPPED) {
                 binding.checkTask.setEnabled(false);
             } else {
                 binding.checkTask.setEnabled(true);
             }
         });
 
+
         if (task.checked()){
             binding.checkTask.setEnabled(false);
         }
+
 
         binding.checkTask.setOnClickListener(view -> {
             var id = task.task().id();
             assert id != null;
             onCheckedClick.accept(id);
+
         });
         return binding.getRoot();
     }
