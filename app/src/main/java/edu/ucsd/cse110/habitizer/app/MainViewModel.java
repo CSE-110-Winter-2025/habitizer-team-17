@@ -77,7 +77,7 @@ public class MainViewModel extends ViewModel {
         }
     };
 
-    private void updateElapsedSinceLastTaskDisplay(long milliseconds) {
+    public void updateElapsedSinceLastTaskDisplay(long milliseconds) {
         if (milliseconds < 0) milliseconds = 0;
 
         long totalSeconds = milliseconds / CustomTimer.MILLISECONDS_PER_SECOND;
@@ -305,7 +305,6 @@ public class MainViewModel extends ViewModel {
     }
 
     public void startRoutine() {
-        startTimer();
 
         List<ActiveTask> activeTasks = new ArrayList<>();
         var routine = currentRoutine.getValue();
@@ -316,7 +315,7 @@ public class MainViewModel extends ViewModel {
         }
 
         activeRoutine.setValue(new ActiveRoutine(routine, activeTasks,0L));
-
+        startTimer();
         screen.setValue(Screen.ACTIVE_ROUTINE_SCREEN);
     }
 
@@ -407,6 +406,7 @@ public class MainViewModel extends ViewModel {
         if (mockedTimer.getState() != TimerState.RUNNING) return;
         mockedTimer.advance();
         currentTimeDisplay.setValue(getFormattedTime(timer.getValue().getElapsedTimeInMilliseconds()));
+        updateElapsedSinceLastTaskDisplay(timer.getValue().getElapsedTimeInMilliseconds()- activeRoutine.getValue().previousTaskEndTime());
     }
 
     public MutableSubject<String> getTitle() {
